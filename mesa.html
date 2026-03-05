@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Comandas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+}
+
+.card{
+    padding:20px;
+    border-radius:18px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    text-decoration:none;
+    color:white;
+}
+
+.libre{ background:#555; }
+.pendiente{ background:#b71c1c; }
+.preparando{ background:#ef6c00; }
+.lista{ background:#2e7d32; }
+
+.icon{
+    font-size:28px;
+    margin-bottom:6px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📋 Comandas</h1>
+
+<div class="grid">
+
+{% for m in mesas %}
+    {% if m.comanda %}
+        {% set estado = m.comanda.estado.lower() %}
+        <a href="/comandas" class="card {{ estado }}">
+            <div class="icon">
+                {% if m.tipo == 'LLEVAR' %}📦{% else %}🪑{% endif %}
+            </div>
+            {{ m.label }}<br>
+            <small>{{ m.comanda.estado }}</small>
+        </a>
+    {% else %}
+        <a href="/venta_rapida?tipo={{ m.tipo }}{% if m.mesa %}&mesa={{ m.mesa }}{% endif %}"
+           class="card libre">
+            <div class="icon">
+                {% if m.tipo == 'LLEVAR' %}📦{% else %}🪑{% endif %}
+            </div>
+            {{ m.label }}<br>
+            <small>Libre</small>
+        </a>
+    {% endif %}
+{% endfor %}
+
+</div>
+
+<a href="/" class="btn-neutral" style="display:block;margin-top:20px">
+⬅ Volver
+</a>
+
+</body>
+</html>

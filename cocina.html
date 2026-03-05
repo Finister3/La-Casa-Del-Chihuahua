@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cocina - La Casa Del Chihuahua</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+    --indigo-500:#6366f1;
+    --indigo-100:#e0e7ff;
+    --emerald-500:#10b981;
+    --emerald-100:#d1fae5;
+    --red-500:#ef4444;
+    --red-100:#fee2e2;
+    --amber-500:#f59e0b;
+    --amber-100:#fef3c7;
+    --slate-50:#f8fafc;
+    --slate-100:#f1f5f9;
+    --slate-200:#e2e8f0;
+    --slate-400:#94a3b8;
+    --slate-600:#475569;
+    --slate-800:#1e293b;
+    --white:#ffffff;
+    --shadow:0 4px 6px -1px rgba(0,0,0,0.1);
+    --shadow-lg:0 20px 25px -5px rgba(0,0,0,0.1);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+}
+
+body{
+    background:var(--slate-50);
+    color:var(--slate-800);
+    padding-bottom:100px;
+}
+
+/* Header */
+.header{
+    background:linear-gradient(135deg,var(--red-500),#dc2626);
+    color:white;
+    padding:20px;
+    position:sticky;
+    top:0;
+    z-index:100;
+    box-shadow:var(--shadow);
+}
+
+.header h1{
+    font-size:24px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.header p{
+    opacity:0.9;
+    font-size:14px;
+    margin-top:4px;
+}
+
+/* Stats Bar */
+.stats-bar{
+    display:flex;
+    gap:12px;
+    padding:16px;
+    overflow-x:auto;
+    background:var(--white);
+    margin:16px;
+    border-radius:16px;
+    box-shadow:var(--shadow);
+}
+
+.stat-item{
+    flex:1;
+    min-width:100px;
+    text-align:center;
+    padding:12px;
+    border-radius:12px;
+}
+
+.stat-number{
+    font-size:24px;
+    font-weight:800;
+    color:var(--indigo-500);
+}
+
+.stat-label{
+    font-size:11px;
+    color:var(--slate-400);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin-top:2px;
+}
+
+/* Grupos de Mesas */
+details.grupo{
+    margin:0 16px 16px;
+    background:var(--white);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+
+summary{
+    padding:20px;
+    font-size:18px;
+    font-weight:700;
+    color:var(--slate-800);
+    cursor:pointer;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--white);
+    border-bottom:1px solid transparent;
+    transition:all 0.2s;
+}
+
+summary::-webkit-details-marker{display:none}
+
+summary::after{
+    content:"▼";
+    font-size:14px;
+    color:var(--slate-400);
+    transition:transform 0.2s;
+}
+
+details.grupo[open] summary{
+    background:var(--indigo-50);
+    color:var(--indigo-500);
+    border-bottom-color:var(--indigo-100);
+}
+
+details.grupo[open] summary::after{
+    transform:rotate(180deg);
+}
+
+.badge-count{
+    background:var(--indigo-500);
+    color:white;
+    padding:4px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+}
+
+/* Comanda Card */
+.comanda{
+    margin:16px;
+    background:var(--white);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:var(--shadow);
+    border-left:5px solid var(--amber-500);
+    position:relative;
+}
+
+.comanda.urgente{
+    border-left-color:var(--red-500);
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.2)}
+    50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}
+}
+
+.comanda-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    padding-bottom:12px;
+    border-bottom:2px solid var(--slate-100);
+}
+
+.comanda-id{
+    font-size:20px;
+    font-weight:800;
+    color:var(--slate-800);
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.estado-badge{
+    background:var(--amber-100);
+    color:var(--amber-600);
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+
+.estado-badge.pendiente{background:var(--red-100);color:var(--red-500);}
+.estado-badge.preparando{background:var(--amber-100);color:var(--amber-600);}
+.estado-badge.lista{background:var(--emerald-100);color:var(--emerald-500);}
+
+/* Info Cliente */
+.cliente-info{
+    display:flex;
+    gap:16px;
+    margin-bottom:16px;
+    font-size:14px;
+    color:var(--slate-600);
+}
+
+.cliente-info span{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+/* Observaciones Generales */
+.obs-general{
+    background:var(--amber-50);
+    border:2px solid var(--amber-200);
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:16px;
+    font-size:14px;
+    color:var(--slate-700);
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+}
+
+.obs-general::before{
+    content:"📝";
+    font-size:16px;
+}
+
+/* Categorías */
+.categoria{
+    margin-top:16px;
+    padding-top:16px;
+    border-top:2px dashed var(--slate-200);
+}
+
+.categoria h3{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--indigo-500);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+/* Productos */
+.producto{
+    background:var(--slate-50);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:10px;
+    border:2px solid transparent;
+    transition:all 0.2s;
+}
+
+.producto:hover{
+    border-color:var(--indigo-200);
+    transform:translateX(4px);
+}
+
+.producto-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.producto-check{
+    width:24px;
+    height:24px;
+    border:3px solid var(--slate-300);
+    border-radius:6px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.2s;
+    flex-shrink:0;
+}
+
+.producto-check.checked{
+    background:var(--emerald-500);
+    border-color:var(--emerald-500);
+}
+
+.producto-check.checked::after{
+    content:"✓";
+    color:white;
+    font-weight:700;
+    font-size:14px;
+}
+
+.producto-nombre{
+    flex:1;
+    font-weight:700;
+    font-size:16px;
+    color:var(--slate-800);
+}
+
+.producto-cantidad{
+    background:var(--indigo-500);
+    color:white;
+    padding:4px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+}
+
+/* Barra de Progreso */
+.progress-container{
+    height:6px;
+    background:var(--slate-200);
+    border-radius:3px;
+    overflow:hidden;
+    margin:10px 0;
+}
+
+.progress-bar{
+    height:100%;
+    background:linear-gradient(90deg,var(--emerald-500),var(--emerald-400));
+    border-radius:3px;
+    transition:width 0.3s ease;
+}
+
+/* Observaciones Item */
+.obs-list{
+    margin-top:10px;
+    padding-left:36px;
+}
+
+.obs-item{
+    background:var(--white);
+    padding:8px 12px;
+    border-radius:8px;
+    margin-bottom:6px;
+    font-size:13px;
+    color:var(--slate-600);
+    border-left:3px solid var(--emerald-500);
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.obs-item::before{
+    content:"•";
+    color:var(--emerald-500);
+    font-weight:700;
+}
+
+/* Botón Entregar Todo */
+.btn-todo{
+    display:block;
+    width:100%;
+    margin-top:20px;
+    padding:16px;
+    background:linear-gradient(135deg,var(--emerald-500),#059669);
+    color:white;
+    text-align:center;
+    text-decoration:none;
+    border-radius:14px;
+    font-weight:700;
+    font-size:16px;
+    box-shadow:0 4px 12px rgba(16,185,129,0.3);
+    border:none;
+    cursor:pointer;
+    transition:transform 0.1s;
+}
+
+.btn-todo:active{
+    transform:scale(0.98);
+}
+
+/* Refresh Button */
+.btn-refresh{
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    width:56px;
+    height:56px;
+    background:var(--indigo-500);
+    color:white;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    font-size:24px;
+    box-shadow:0 8px 20px rgba(99,102,241,0.4);
+    border:none;
+    cursor:pointer;
+    z-index:90;
+    transition:transform 0.2s;
+}
+
+.btn-refresh:hover{transform:rotate(180deg) scale(1.1)}
+
+/* Volver */
+.btn-volver{
+    display:block;
+    margin:20px 16px;
+    padding:14px;
+    background:var(--white);
+    color:var(--slate-600);
+    text-align:center;
+    text-decoration:none;
+    border-radius:12px;
+    font-weight:600;
+    box-shadow:var(--shadow);
+    border:2px solid var(--slate-200);
+}
+
+.empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--slate-400);
+}
+
+.empty-state-icon{
+    font-size:48px;
+    margin-bottom:16px;
+    opacity:0.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🔥 Pantalla de Cocina</h1>
+    <p>Administración de comandas en tiempo real</p>
+</div>
+
+{% set grupos = {
+    "Mesa 1": [],
+    "Mesa 2": [],
+    "Mesa 3": [],
+    "Mesa 4": [],
+    "Mesa 5": [],
+    "Para llevar": []
+} %}
+
+{% for c in comandas %}
+    {% if c.tipo == "LLEVAR" %}
+        {% set _ = grupos["Para llevar"].append(c) %}
+    {% else %}
+        {% set _ = grupos["Mesa " ~ c.mesa].append(c) %}
+    {% endif %}
+{% endfor %}
+
+{% set total_pendientes = comandas|selectattr("estado","equalto","Pendiente")|list|length %}
+{% set total_preparando = comandas|selectattr("estado","equalto","Preparando")|list|length %}
+{% set total_listas = comandas|selectattr("estado","equalto","Lista")|list|length %}
+
+<div class="stats-bar">
+    <div class="stat-item" style="background:var(--red-100)">
+        <div class="stat-number" style="color:var(--red-500)">{{total_pendientes}}</div>
+        <div class="stat-label">Pendientes</div>
+    </div>
+    <div class="stat-item" style="background:var(--amber-100)">
+        <div class="stat-number" style="color:var(--amber-500)">{{total_preparando}}</div>
+        <div class="stat-label">Preparando</div>
+    </div>
+    <div class="stat-item" style="background:var(--emerald-100)">
+        <div class="stat-number" style="color:var(--emerald-500)">{{total_listas}}</div>
+        <div class="stat-label">Listas</div>
+    </div>
+</div>
+
+{% set hay_comandas = comandas|length > 0 %}
+{% if not hay_comandas %}
+<div class="empty-state">
+    <div class="empty-state-icon">🍽️</div>
+    <h3>Sin comandas activas</h3>
+    <p>Las nuevas comandas aparecerán aquí automáticamente</p>
+</div>
+{% endif %}
+
+{% for nombre, lista in grupos.items() %}
+{% if lista|length > 0 %}
+<details class="grupo" open>
+<summary>
+    <span>{% if nombre == "Para llevar" %}📦{% else %}🪑{% endif %} {{ nombre }}</span>
+    <span class="badge-count">{{ lista|length }}</span>
+</summary>
+
+{% for c in lista %}
+<div class="comanda {% if c.estado == 'Pendiente' and loop.index == 1 %}urgente{% endif %}">
+
+<div class="comanda-header">
+    <div class="comanda-id">
+        🧾 #{{ c.id }}
+        {% if c.alias %}<small style="color:var(--slate-400);font-size:14px">- {{ c.alias }}</small>{% endif %}
+    </div>
+    <span class="estado-badge {{ c.estado.lower() }}">{{ c.estado }}</span>
+</div>
+
+{% if c.observaciones %}
+<div class="obs-general">
+    {{ c.observaciones }}
+</div>
+{% endif %}
+
+{% for categoria, items in c.detalle|groupby("categoria") %}
+<div class="categoria">
+<h3>📂 {{ categoria }}</h3>
+
+{% for d in items %}
+{% set prog = (d.entregado_cantidad / d.cantidad * 100) if d.cantidad > 0 else 0 %}
+<div class="producto">
+
+<div class="producto-header">
+    <div class="producto-check {% if d.entregado_cantidad >= d.cantidad %}checked{% endif %}" 
+         onclick="toggleCheck(this, {{ d.id }})"></div>
+    <div class="producto-nombre">{{ d.nombre }}</div>
+    <div class="producto-cantidad">x{{ d.cantidad }}</div>
+</div>
+
+<div class="progress-container">
+    <div class="progress-bar" style="width:{{ prog }}%"></div>
+</div>
+
+{% if d.observaciones %}
+<div class="obs-list">
+{% for o in d.observaciones.split("||") %}
+{% if o.strip() %}
+<div class="obs-item">{{ o }}</div>
+{% endif %}
+{% endfor %}
+</div>
+{% endif %}
+
+</div>
+{% endfor %}
+</div>
+{% endfor %}
+
+<a href="/entregar_todo/{{ c.id }}" class="btn-todo">
+    🚀 Entregar Todo
+</a>
+
+</div>
+{% endfor %}
+</details>
+{% endif %}
+{% endfor %}
+
+<a href="/" class="btn-volver">⬅ Volver al Inicio</a>
+<a href="/cocina" class="btn-refresh">⟳</a>
+
+<script>
+document.querySelectorAll("details.grupo").forEach(d => {
+    d.addEventListener("toggle", () => {
+        if(d.open){
+            document.querySelectorAll("details.grupo").forEach(o => {
+                if(o !== d) o.removeAttribute("open");
+            });
+        }
+    });
+});
+
+function toggleCheck(el, detalleId){
+    const isChecked = el.classList.toggle("checked");
+    const progressBar = el.closest(".producto").querySelector(".progress-bar");
+    
+    if(isChecked){
+        progressBar.style.width = "100%";
+    } else {
+        progressBar.style.width = "0%";
+    }
+    
+    fetch("/toggle_entregado",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:`detalle_id=${detalleId}&checked=${isChecked}`
+    });
+}
+
+let ultimoIdActual = {{ comandas[-1].id if comandas else 0 }};
+
+setInterval(() => {
+    fetch("/api/ultima_comanda")
+        .then(res => res.json())
+        .then(data => {
+            if (data.ultimo_id > ultimoIdActual) {
+                location.reload();
+            }
+        })
+        .catch(() => {});
+}, 5000);
+</script>
+
+</body>
+</html>

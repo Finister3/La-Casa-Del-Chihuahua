@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Gastos - La Casa Del Chihuahua</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4f46e5">
+
+    <style>
+    :root {
+        --bg-primary: #f8fafc;
+        --bg-secondary: #f1f5f9;
+        --surface: #ffffff;
+        --surface-hover: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-tertiary: #94a3b8;
+        --accent: #4f46e5;
+        --accent-light: #e0e7ff;
+        --accent-hover: #4338ca;
+        --success: #10b981;
+        --success-bg: #d1fae5;
+        --danger: #ef4444;
+        --danger-bg: #fee2e2;
+        --warning: #f59e0b;
+        --warning-bg: #fef3c7;
+        --border: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --radius: 12px;
+        --radius-lg: 16px;
+    }
+
+    [data-theme="dark"] {
+        --bg-primary: #020617;
+        --bg-secondary: #0f172a;
+        --surface: #0f172a;
+        --surface-hover: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-tertiary: #64748b;
+        --border: #1e293b;
+        --border-strong: #334155;
+        --accent: #6366f1;
+        --accent-light: #1e1b4b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --bg-primary: #020617;
+            --bg-secondary: #0f172a;
+            --surface: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #1e293b;
+            --accent: #6366f1;
+        }
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        line-height: 1.5;
+    }
+
+    .header {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+        color: white;
+        padding: 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .header-content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .brand-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .brand h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .btn-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px 20px;
+    }
+
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+        font-size: 1.125rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    input, select, textarea {
+        padding: 12px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-family: inherit;
+        width: 100%;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        border-radius: var(--radius);
+        border: none;
+        background: var(--accent);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+        background: var(--surface-hover);
+    }
+
+    .btn-danger {
+        background: var(--danger);
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    .gasto-item {
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s;
+    }
+
+    .gasto-item:hover {
+        border-color: var(--border-strong);
+        transform: translateX(4px);
+    }
+
+    .gasto-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 8px;
+    }
+
+    .gasto-categoria {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+
+    .gasto-monto {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--danger);
+        font-family: 'Courier New', monospace;
+    }
+
+    .gasto-meta {
+        display: flex;
+        gap: 12px;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+
+    .gasto-semana {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: var(--accent-light);
+        color: var(--accent);
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .gasto-nota {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-style: italic;
+        margin-bottom: 12px;
+        padding: 8px;
+        background: var(--surface);
+        border-radius: 6px;
+        border-left: 3px solid var(--border);
+    }
+
+    .gasto-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 0.875rem;
+        flex: 1;
+    }
+
+    .muted {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .semana-info {
+        background: linear-gradient(135deg, var(--accent-light) 0%, var(--surface) 100%);
+        border: 2px solid var(--accent);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .semana-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+    }
+
+    .semana-fecha {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .file-preview {
+        margin-top: 8px;
+        padding: 8px;
+        background: var(--bg-secondary);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .total-bar {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .total-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .total-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--danger);
+        font-family: 'Courier New', monospace;
+    }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div class="header-content">
+        <div class="brand">
+            <div class="brand-icon">💸</div>
+            <div>
+                <h1>Gestión de Gastos</h1>
+            </div>
+        </div>
+        <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Info de Semana Actual -->
+    {% if semana_actual %}
+    <div class="semana-info">
+        <div>
+            <div class="semana-label">Semana Actual</div>
+            <div class="semana-fecha">Del {{ semana_actual.fecha_inicio }} al {{ semana_actual.fecha_fin }}</div>
+        </div>
+        <div style="text-align: right;">
+            <div class="semana-label">Estado</div>
+            <div style="font-weight: 600; color: var(--success);">● Activa</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Total de Gastos -->
+    {% if gastos %}
+    <div class="total-bar">
+        <span class="total-label">Total Gastos Registrados</span>
+        <span class="total-amount">${{ "%.2f"|format(gastos|sum(attribute='monto')) }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Formulario Nuevo Gasto -->
+    <section class="card">
+        <h2>➕ Nuevo Gasto</h2>
+
+        <form action="/subir_ticket" method="post" enctype="multipart/form-data">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" name="fecha" id="fecha_gasto" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select name="categoria" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Gas">⛽ Gas</option>
+                        <option value="Luz">💡 Luz</option>
+                        <option value="Internet">📶 Internet</option>
+                        <option value="Gasolina">🚗 Gasolina</option>
+                        <option value="Agua">💧 Agua</option>
+                        <option value="Surtido">📦 Surtido</option>
+                        <option value="Credito">💳 Crédito</option>
+                        <option value="Derek">👤 Derek</option>
+                        <option value="Sueldos">👥 Sueldos</option>
+                        <option value="Otros">📋 Otros</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Monto ($)</label>
+                    <input name="monto" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Gasto</label>
+                    <select name="tipo_gasto">
+                        <option value="VARIABLE">Variable</option>
+                        <option value="FIJO">Fijo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nota (opcional)</label>
+                <textarea name="nota" rows="2" placeholder="Descripción detallada del gasto..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Ticket / Comprobante (opcional)</label>
+                <input type="file" name="foto" accept="image/*" capture="environment" id="foto_input">
+                <div class="file-preview" id="file_preview" style="display: none;">
+                    📷 <span id="file_name"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn">💾 Guardar Gasto</button>
+        </form>
+    </section>
+
+    <!-- Listado de Gastos -->
+    <section class="card">
+        <h2>🧾 Historial de Gastos</h2>
+
+        {% if gastos %}
+            {% for g in gastos %}
+            <div class="gasto-item">
+                <div class="gasto-header">
+                    <div class="gasto-categoria">
+                        {% if 'Gas' in g.categoria %}⛽{% elif 'Luz' in g.categoria %}💡{% elif 'Internet' in g.categoria %}📶{% elif 'Agua' in g.categoria %}💧{% elif 'Surtido' in g.categoria %}📦{% elif 'Credito' in g.categoria %}💳{% elif 'Derek' in g.categoria %}👤{% elif 'Sueldos' in g.categoria %}👥{% else %}📋{% endif %}
+                        {{ g.categoria }}
+                    </div>
+                    <div class="gasto-monto">${{ "%.2f"|format(g.monto) }}</div>
+                </div>
+                
+                <div class="gasto-meta">
+                    <span>📅 {{ g.fecha }}</span>
+                    {% if g.semana %}
+                    <span class="gasto-semana">📅 Sem: {{ g.semana }}</span>
+                    {% endif %}
+                    {% if g.archivo %}
+                    <span>📷 Ticket adjunto</span>
+                    {% endif %}
+                </div>
+
+                {% if g.nota %}
+                <div class="gasto-nota">
+                    📝 {{ g.nota }}
+                </div>
+                {% endif %}
+
+                <div class="gasto-actions">
+                    {% if g.archivo %}
+                    <a href="{{ url_for('static', filename='tickets/' + g.archivo) }}" target="_blank" class="btn btn-secondary btn-small">
+                        👁 Ver Ticket
+                    </a>
+                    {% endif %}
+                    <form action="/gastos/eliminar/{{ g.id }}" method="POST" style="flex: 1;" onsubmit="return confirm('¿Eliminar este gasto? Se actualizará el apartado correspondiente.');">
+                        <button type="submit" class="btn btn-danger btn-small">🗑 Eliminar</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="muted">No hay gastos registrados aún</p>
+        {% endif %}
+    </section>
+
+    <a href="/control" class="btn btn-secondary">⬅ Volver a Control</a>
+
+</div>
+
+<script>
+// Tema
+function initTheme() {
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+    } else if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    updateIcon();
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+}
+
+function updateIcon() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+}
+
+// Fecha actual por defecto
+document.addEventListener("DOMContentLoaded", () => {
+    const inputFecha = document.getElementById("fecha_gasto");
+    if (inputFecha) {
+        const hoy = new Date().toISOString().split("T")[0];
+        inputFecha.value = hoy;
+    }
+    
+    // Preview de archivo
+    const fileInput = document.getElementById('foto_input');
+    const filePreview = document.getElementById('file_preview');
+    const fileName = document.getElementById('file_name');
+    
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            fileName.textContent = this.files[0].name;
+            filePreview.style.display = 'block';
+        } else {
+            filePreview.style.display = 'none';
+        }
+    });
+    
+    initTheme();
+});
+</script>
+
+</body>
+</html>

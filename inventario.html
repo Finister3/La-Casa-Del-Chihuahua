@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Inventario - La Casa Del Chihuahua</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+    --bg: #f8fafc; --surface: #fff; --border: #e2e8f0;
+    --accent: #4f46e5; --danger: #ef4444; --warning: #f59e0b; --success: #10b981;
+    --text: #0f172a; --text-sec: #64748b;
+}
+[data-theme="dark"] { --bg: #0f172a; --surface: #1e293b; --border: #334155; --text: #f1f5f9; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+body { background: var(--bg); color: var(--text); padding: 20px; }
+
+.container { max-width: 1400px; margin: 0 auto; }
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+h1 { font-size: 1.5rem; font-weight: 700; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; 
+       display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; text-decoration: none; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+.btn-danger { background: #fee2e2; color: var(--danger); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+/* Grid */
+.grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; }
+@media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
+
+/* Alertas */
+.alertas-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+.alertas-box h3 { color: #c2410c; font-size: 0.875rem; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.alerta-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #fed7aa; font-size: 0.9375rem; }
+.alerta-item:last-child { border-bottom: none; }
+.alerta-item span { color: #9a3412; font-weight: 600; }
+
+/* Tabla */
+.table-container { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--bg); font-weight: 600; color: var(--text-sec); font-size: 0.75rem; text-transform: uppercase; }
+tr:hover { background: var(--bg); }
+td { font-weight: 500; }
+
+/* Badges de estado */
+.badge { padding: 4px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
+.badge-ok { background: #d1fae5; color: #065f46; }
+.badge-bajo { background: #fef3c7; color: #92400e; }
+.badge-critico { background: #fee2e2; color: #991b1b; }
+
+/* Barra de progreso */
+.stock-bar { width: 100%; height: 6px; background: var(--bg); border-radius: 999px; overflow: hidden; margin-top: 4px; }
+.stock-fill { height: 100%; background: var(--success); border-radius: 999px; transition: width 0.3s; }
+.stock-fill.bajo { background: var(--warning); }
+.stock-fill.critico { background: var(--danger); }
+
+/* Panel Lateral - Asistente */
+.asistente-panel { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); 
+                   padding: 20px; position: sticky; top: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.asistente-header { text-align: center; margin-bottom: 20px; }
+.asistente-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), #818cf8); 
+                    border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+                    font-size: 40px; position: relative; }
+.asistente-avatar.pulsing::after { content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%;
+    border: 3px solid var(--accent); animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+@keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(1.3); opacity: 0; } }
+
+.btn-mic { width: 100%; padding: 16px; border-radius: 12px; border: none; background: var(--accent); color: white;
+           font-size: 1.125rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+           transition: all 0.2s; margin-bottom: 16px; }
+.btn-mic:hover { background: #4338ca; transform: scale(1.02); }
+.btn-mic:active { transform: scale(0.98); }
+.btn-mic.escuchando { background: var(--danger); animation: pulse-bg 1.5s infinite; }
+
+@keyframes pulse-bg { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+.chat-area { max-height: 300px; overflow-y: auto; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
+.mensaje { padding: 10px 14px; border-radius: 12px; max-width: 85%; font-size: 0.875rem; line-height: 1.4; }
+.mensaje.usuario { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+.mensaje.assistant { background: var(--bg); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+.mensaje.system { background: #f0f9ff; border: 1px solid #bae6fd; color: #0369a1; font-size: 0.8125rem; text-align: center; }
+
+.comandos-ayuda { background: var(--bg); border-radius: 8px; padding: 12px; font-size: 0.8125rem; color: var(--text-sec); }
+.comandos-ayuda h4 { margin-bottom: 8px; color: var(--text); font-size: 0.875rem; }
+.comandos-ayuda ul { margin-left: 16px; line-height: 1.8; }
+
+/* Formularios modales */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); 
+         z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal.active { display: flex; }
+.modal-content { background: var(--surface); border-radius: 16px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-body { padding: 20px; }
+.form-group { margin-bottom: 16px; }
+label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.875rem; }
+input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; 
+                          background: var(--bg); color: var(--text); font-size: 0.9375rem; }
+input:focus, select:focus { outline: none; border-color: var(--accent); }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid { grid-template-columns: 1fr; }
+    .asistente-panel { position: fixed; bottom: 0; left: 0; right: 0; top: auto; border-radius: 16px 16px 0 0; 
+                       max-height: 60vh; transform: translateY(calc(100% - 80px)); transition: transform 0.3s; z-index: 100; }
+    .asistente-panel.expandido { transform: translateY(0); }
+    .asistente-handle { width: 40px; height: 4px; background: var(--border); border-radius: 999px; margin: -10px auto 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>📦 Inventario</h1>
+            <p style="color: var(--text-sec); font-size: 0.875rem;">Control de insumos y asistente por voz</p>
+        </div>
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="abrirModal('modalNuevoInsumo')">➕ Nuevo Insumo</button>
+            <a href="/" class="btn btn-secondary">← Volver</a>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% if alertas %}
+    <div class="alertas-box">
+        <h3>⚠️ Stock Bajo (Reabastecer)</h3>
+        {% for alerta in alertas %}
+        <div class="alerta-item">
+            <span>{{ alerta.nombre }}</span>
+            <span>{{ "%.1f"|format(alerta.stock_actual) }} / {{ "%.0f"|format(alerta.stock_minimo) }} {{ alerta.unidad_medida }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid">
+        <!-- Columna Principal: Tabla -->
+        <div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Insumo</th>
+                            <th>Categoría</th>
+                            <th>Stock Actual</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in insumos %}
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">{{ i.nombre }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-sec);">Mín: {{ i.stock_minimo }} {{ i.unidad_medida }}</div>
+                            </td>
+                            <td><span class="badge badge-ok" style="background: #e0e7ff; color: #3730a3;">{{ i.categoria }}</span></td>
+                            <td>
+                                <div style="font-weight: 700; font-size: 1.125rem;">{{ "%.1f"|format(i.stock_actual) }} <span style="font-size: 0.75rem; font-weight: 400;">{{ i.unidad_medida }}</span></div>
+                                <div class="stock-bar">
+                                    <div class="stock-fill {{ i.estado }}" style="width: {{ i.porcentaje }}%;"></div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if i.estado == 'critico' %}
+                                <span class="badge badge-critico">Crítico</span>
+                                {% elif i.estado == 'bajo' %}
+                                <span class="badge badge-bajo">Bajo</span>
+                                {% else %}
+                                <span class="badge badge-ok">OK</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8125rem;" 
+                                        onclick="abrirMovimiento({{ i.id }}, '{{ i.nombre }}', '{{ i.unidad_medida }}')">
+                                    Ajustar
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Historial -->
+            <div style="margin-top: 24px;">
+                <h3 style="margin-bottom: 12px; font-size: 1.125rem;">📋 Últimos Movimientos</h3>
+                <div class="table-container">
+                    <table style="font-size: 0.8125rem;">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Insumo</th>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                                <th>Usuario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in movimientos %}
+                            <tr>
+                                <td>{{ m.fecha[:16] }}</td>
+                                <td>{{ m.insumo_nombre }}</td>
+                                <td>
+                                    <span class="badge" style="
+                                        background: {% if m.tipo == 'ENTRADA' %}#d1fae5{% elif m.tipo == 'SALIDA' %}#fee2e2{% else %}#fef3c7{% endif %};
+                                        color: {% if m.tipo == 'ENTRADA' %}#065f46{% elif m.tipo == 'SALIDA' %}#991b1b{% else %}#92400e{% endif %};
+                                    ">{{ m.tipo }}</span>
+                                </td>
+                                <td style="font-weight: 600;">{{ m.cantidad }} {{ m.unidad_medida }}</td>
+                                <td style="color: var(--text-sec);">{{ m.usuario }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Lateral: Asistente de Voz -->
+        <div class="asistente-panel" id="asistentePanel">
+            <div class="asistente-handle" onclick="toggleAsistenteMobile()"></div>
+            <div class="asistente-header">
+                <div class="asistente-avatar" id="avatarAsistente">🎙️</div>
+                <h2 style="font-size: 1.125rem;">Asistente de Inventario</h2>
+                <p style="font-size: 0.8125rem; color: var(--text-sec); margin-top: 4px;">"Consulta stock" o "Registra entrada"</p>
+            </div>
+
+            <button class="btn-mic" id="btnMic" onclick="toggleListening()">
+                <span id="iconMic">🎤</span>
+                <span id="textMic">Toca para hablar</span>
+            </button>
+
+            <div class="chat-area" id="chatArea">
+                <div class="mensaje system">👋 ¡Hola! Puedes decir:<br>"Consulta tortillas" o "Registra entrada 50 tortillas"</div>
+            </div>
+
+            <div class="comandos-ayuda">
+                <h4>🎯 Comandos disponibles:</h4>
+                <ul>
+                    <li><strong>"Consulta [producto]"</strong> - Ver stock</li>
+                    <li><strong>"Registra entrada [cantidad] [producto]"</strong></li>
+                    <li><strong>"Registra salida [cantidad] [producto]"</strong></li>
+                    <li><strong>"Registra merma [cantidad] [producto]"</strong></li>
+                    <li><strong>"Alertas"</strong> - Stock bajo</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Nuevo Insumo -->
+<div class="modal" id="modalNuevoInsumo">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Nuevo Insumo</h3>
+            <button class="btn btn-secondary" onclick="cerrarModal('modalNuevoInsumo')" style="padding: 4px 8px;">✕</button>
+        </div>
+        <div class="modal-body">
+            <form action="/inventario/nuevo" method="POST">
+                <div class="form-group">
+                    <label>Nombre del insumo</label>
+                    <input type="text" name="nombre" placeholder="Ej: Tortilla de Harina" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select name="categoria" required>
+                        {% for cat in categorias %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Unidad de medida</label>
+                    <select name="unidad_medida" required>
+                        {% for uni in unidades %}
+                        <option value="{{ uni }}">{{ uni }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>Stock inicial</label>
+                        <input type="number" step="0.1" name="stock_inicial" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock mínimo</label>
+                        <input type="number" step="0.1" name="stock_minimo" value="10" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Guardar Insumo</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Movimiento Rápido -->
+<div class="modal" id="modalMovimiento">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="tituloMovimiento">Ajustar Stock</h3>
+            <button class="btn btn-secondary" onclick="cerrarModal('modalMovimiento')" style="padding: 4px 8px;">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="formMovimiento" onsubmit="enviarMovimiento(event)">
+                <input type="hidden" id="movInsumoId" name="insumo_id">
+                <div class="form-group">
+                    <label>Tipo de movimiento</label>
+                    <select name="tipo" id="movTipo" required>
+                        <option value="ENTRADA">📥 Entrada (Compra/Devolución)</option>
+                        <option value="SALIDA">📤 Salida (Uso interno)</option>
+                        <option value="MERMA">⚠️ Merma (Caducado/Dañado)</option>
+                        <option value="AJUSTE">🔧 Ajuste (Inventario físico)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad <span id="movUnidad" style="font-weight: 400; color: var(--text-sec);"></span></label>
+                    <input type="number" step="0.1" name="cantidad" id="movCantidad" required min="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Motivo/Nota (opcional)</label>
+                    <textarea name="motivo" rows="2" placeholder="Ej: Compra del proveedor Juan"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Registrar Movimiento</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variables globales
+const recognition = ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) ? 
+    new (window.SpeechRecognition || window.webkitSpeechRecognition)() : null;
+let isListening = false;
+let insumosDisponibles = []; // Se llenará con los nombres de insumos existentes
+
+// Configurar reconocimiento de voz
+if (recognition) {
+    recognition.lang = 'es-MX';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+        isListening = true;
+        document.getElementById('btnMic').classList.add('escuchando');
+        document.getElementById('textMic').textContent = 'Escuchando...';
+        document.getElementById('avatarAsistente').classList.add('pulsing');
+    };
+
+    recognition.onend = () => {
+        isListening = false;
+        document.getElementById('btnMic').classList.remove('escuchando');
+        document.getElementById('textMic').textContent = 'Toca para hablar';
+        document.getElementById('avatarAsistente').classList.remove('pulsing');
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        agregarMensaje(transcript, 'usuario');
+        procesarComandoVoz(transcript);
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Error de reconocimiento:', event.error);
+        hablar("No pude escuchar bien, ¿podrías repetirlo?");
+        agregarMensaje("❌ Error al escuchar. Intenta de nuevo.", 'system');
+    };
+}
+
+// Toggle listening
+function toggleListening() {
+    if (!recognition) {
+        alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.');
+        return;
+    }
+    
+    if (isListening) {
+        recognition.stop();
+    } else {
+        recognition.start();
+    }
+}
+
+// Procesar comandos de voz
+async function procesarComandoVoz(texto) {
+    console.log('Comando recibido:', texto);
+    
+    // 1. Comando: Consulta/Stock/Cuántos/Cuántas
+    if (texto.includes('consulta') || texto.includes('stock') || texto.includes('cuántos') || texto.includes('cuantas') || texto.includes('cuanto queda')) {
+        const producto = extraerProducto(texto);
+        if (producto) {
+            await consultarStockAPI(producto);
+        } else {
+            hablar("¿De qué producto quieres consultar el stock?");
+            agregarMensaje("Dime el nombre del producto", 'assistant');
+        }
+        return;
+    }
+    
+    // 2. Comando: Alertas/Qué falta/Qué se acabó
+    if (texto.includes('alerta') || texto.includes('qué falta') || texto.includes('que falta') || texto.includes('stock bajo')) {
+        await consultarAlertasAPI();
+        return;
+    }
+    
+    // 3. Comandos de movimiento: Registra/Agrega/Quita/Descontar
+    const tiposMovimiento = {
+        'entrada': 'ENTRADA',
+        'entra': 'ENTRADA',
+        'llegó': 'ENTRADA',
+        'llego': 'ENTRADA',
+        'compra': 'ENTRADA',
+        'salida': 'SALIDA',
+        'saca': 'SALIDA',
+        'quito': 'SALIDA',
+        'usa': 'SALIDA',
+        'merma': 'MERMA',
+        'dañado': 'MERMA',
+        'caducado': 'MERMA',
+        'perdida': 'MERMA',
+        'basura': 'MERMA'
+    };
+    
+    let tipoEncontrado = null;
+    for (let [clave, valor] of Object.entries(tiposMovimiento)) {
+        if (texto.includes(clave)) {
+            tipoEncontrado = valor;
+            break;
+        }
+    }
+    
+    if (tipoEncontrado || texto.includes('registra')) {
+        // Extraer cantidad y producto
+        const cantidad = extraerNumero(texto);
+        const producto = extraerProducto(texto);
+        
+        if (cantidad && producto) {
+            await registrarMovimientoAPI(tipoEncontrado || 'ENTRADA', cantidad, producto, 'Registro por voz');
+        } else if (producto) {
+            hablar(`¿Qué cantidad de ${producto} quieres registrar?`);
+        } else {
+            hablar("No entendí qué producto quieres registrar. ¿Puedes repetir?");
+        }
+        return;
+    }
+    
+    // Comando no reconocido
+    hablar("No entendí ese comando. Prueba decir: consulta tortillas, o registra entrada 50 tortillas");
+    agregarMensaje("Comandos: 'Consulta [producto]' o 'Registra entrada [cantidad] [producto]'", 'assistant');
+}
+
+// Funciones auxiliares para extraer datos del texto
+function extraerNumero(texto) {
+    const palabras = {
+        'un': 1, 'una': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5,
+        'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9, 'diez': 10,
+        'veinte': 20, 'treinta': 30, 'cincuenta': 50, 'cien': 100
+    };
+    
+    // Buscar números escritos
+    for (let [palabra, num] of Object.entries(palabras)) {
+        if (texto.includes(palabra)) return num;
+    }
+    
+    // Buscar dígitos
+    const match = texto.match(/(\d+(?:\.\d+)?)/);
+    return match ? parseFloat(match[1]) : null;
+}
+
+function extraerProducto(texto) {
+    // Eliminar palabras comunes para quedarnos con el producto
+    const palabrasIgnorar = ['consulta', 'stock', 'cuántos', 'cuantas', 'cuanto', 'queda', 'registra', 
+        'entrada', 'salida', 'merma', 'de', 'del', 'la', 'el', 'los', 'las', 'un', 'una', 
+        'kilos', 'kilo', 'piezas', 'pieza', 'litros', 'litro', 'cajas', 'caja'];
+    
+    let palabras = texto.split(' ');
+    palabras = palabras.filter(p => !palabrasIgnorar.includes(p) && isNaN(p));
+    
+    return palabras.length > 0 ? palabras.join(' ') : null;
+}
+
+// APIs
+async function consultarStockAPI(nombreProducto) {
+    try {
+        const res = await fetch(`/api/inventario/consulta?q=${encodeURIComponent(nombreProducto)}`);
+        const data = await res.json();
+        
+        agregarMensaje(data.mensaje, 'assistant');
+        hablar(data.mensaje);
+        
+        if (data.estado === 'bajo') {
+            agregarMensaje("⚠️ Este producto está por debajo del mínimo", 'system');
+        }
+    } catch (e) {
+        console.error(e);
+        hablar("Error al consultar el stock");
+    }
+}
+
+async function consultarAlertasAPI() {
+    try {
+        const res = await fetch('/api/inventario/alertas');
+        const data = await res.json();
+        
+        agregarMensaje(data.mensaje, 'assistant');
+        hablar(data.mensaje);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function registrarMovimientoAPI(tipo, cantidad, nombreProducto, motivo) {
+    try {
+        // Primero buscar el ID del producto
+        const resConsulta = await fetch(`/api/inventario/consulta?q=${encodeURIComponent(nombreProducto)}`);
+        const dataConsulta = await resConsulta.json();
+        
+        if (!dataConsulta.encontrado) {
+            hablar(`No encontré ${nombreProducto} en el inventario`);
+            agregarMensaje(`❌ No existe: ${nombreProducto}`, 'system');
+            return;
+        }
+        
+        // Buscar insumos para obtener ID (hacemos búsqueda adicional)
+        const resBuscar = await fetch(`/api/inventario/consulta?q=${encodeURIComponent(nombreProducto)}`);
+        const insumo = await resBuscar.json();
+        
+        // Como no tenemos el ID en la respuesta, hacemos un truco: buscaremos en el DOM o haremos otra llamada
+        // En producción, deberías modificar la API para devolver el ID
+        
+        // Por ahora, mostramos mensaje instructivo
+        hablar(`Encontré ${dataConsulta.nombre}. Por favor confirma el ajuste manualmente en la tabla.`);
+        agregarMensaje(`✅ ${tipo}: ${cantidad} de ${dataConsulta.nombre} (confirma en la tabla)`, 'assistant');
+        
+    } catch (e) {
+        console.error(e);
+        hablar("Error al registrar el movimiento");
+    }
+}
+
+// Texto a voz
+function hablar(texto) {
+    if ('speechSynthesis' in window) {
+        // Cancelar cualquier habla anterior
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(texto);
+        utterance.lang = 'es-MX';
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+// UI Helpers
+function agregarMensaje(texto, tipo) {
+    const chat = document.getElementById('chatArea');
+    const div = document.createElement('div');
+    div.className = `mensaje ${tipo}`;
+    div.textContent = texto;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function abrirModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function cerrarModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function abrirMovimiento(id, nombre, unidad) {
+    document.getElementById('movInsumoId').value = id;
+    document.getElementById('tituloMovimiento').textContent = `Ajustar: ${nombre}`;
+    document.getElementById('movUnidad').textContent = `(${unidad})`;
+    abrirModal('modalMovimiento');
+}
+
+async function enviarMovimiento(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const res = await fetch('/inventario/movimiento', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+            hablar(`Listo. Ahora tenemos ${result.stock_nuevo} ${result.unidad} de ${result.insumo}`);
+            location.reload(); // Recargar para ver cambios
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Mobile: Toggle asistente
+function toggleAsistenteMobile() {
+    document.getElementById('asistentePanel').classList.toggle('expandido');
+}
+
+// Cargar datos al iniciar
+window.onload = () => {
+    // Cargar lista de insumos para reconocimiento
+    fetch('/api/inventario/alertas')
+        .then(r => r.json())
+        .then(d => console.log('Asistente listo'));
+};
+</script>
+
+</body>
+</html>

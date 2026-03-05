@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mapa de Mesas - La Casa Del Chihuahua</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#4f46e5">
+
+<style>
+:root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --surface: #ffffff;
+    --surface-hover: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --accent: #4f46e5;
+    --accent-light: #e0e7ff;
+    --accent-hover: #4338ca;
+    --success: #10b981;
+    --success-bg: #d1fae5;
+    --danger: #ef4444;
+    --danger-bg: #fee2e2;
+    --warning: #f59e0b;
+    --warning-bg: #fef3c7;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --radius: 12px;
+    --radius-lg: 16px;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --surface: #0f172a;
+    --surface-hover: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border: #1e293b;
+    --border-strong: #334155;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg-primary: #020617;
+        --bg-secondary: #0f172a;
+        --surface: #0f172a;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --border: #1e293b;
+        --accent: #6366f1;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.brand h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.brand span {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+/* ===== CONTAINER ===== */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 20px;
+}
+
+/* ===== STATUS BAR ===== */
+.status-bar {
+    display: flex;
+    justify-content: space-around;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.status-item {
+    text-align: center;
+}
+
+.status-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.status-value.free { color: var(--success); }
+.status-value.busy { color: var(--danger); }
+
+.status-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+}
+
+/* ===== MESAS GRID ===== */
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.mesas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+    .mesas-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ===== MESA CARD ===== */
+.mesa-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.mesa-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.mesa-card.libre {
+    border-color: var(--success);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--success-bg) 100%);
+}
+
+.mesa-card.ocupada {
+    border-color: var(--danger);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--danger-bg) 100%);
+}
+
+.mesa-card.llevar {
+    border-color: var(--warning);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--warning-bg) 100%);
+    grid-column: span 2;
+}
+
+@media (min-width: 640px) {
+    .mesa-card.llevar {
+        grid-column: span 3;
+    }
+}
+
+.mesa-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.mesa-numero {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.mesa-status {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.mesa-card.libre .mesa-status {
+    background: var(--success);
+    color: white;
+}
+
+.mesa-card.ocupada .mesa-status {
+    background: var(--danger);
+    color: white;
+}
+
+.mesa-card.llevar .mesa-status {
+    background: var(--warning);
+    color: white;
+}
+
+.mesa-action {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.mesa-card:hover .mesa-action {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* ===== ACCIONES ===== */
+.actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 14px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border-strong);
+}
+
+/* ===== EMPTY / INFO ===== */
+.info-card {
+    background: var(--accent-light);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 24px;
+    color: var(--accent);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+[data-theme="dark"] .info-card {
+    background: rgba(99, 102, 241, 0.1);
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-content">
+        <div class="brand">
+            <div class="brand-icon">🪑</div>
+            <div>
+                <h1>Mapa de Mesas</h1>
+                <span>Visualización del Salón</span>
+            </div>
+        </div>
+        <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Resumen -->
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-value free" id="count-free">0</div>
+            <div class="status-label">Libres</div>
+        </div>
+        <div class="status-item">
+            <div class="status-value busy" id="count-busy">0</div>
+            <div class="status-label">Ocupadas</div>
+        </div>
+        <div class="status-item">
+            <div class="status-value" id="count-total">5</div>
+            <div class="status-label">Total Mesas</div>
+        </div>
+    </div>
+
+    <!-- Info -->
+    <div class="info-card">
+        <span>💡</span>
+        <span>Toca una mesa libre para crear una comanda, o una ocupada para ver detalles</span>
+    </div>
+
+    <!-- Mapa de Mesas -->
+    <h2 class="section-title">🍽️ Mesas del Salón</h2>
+    
+    <div class="mesas-grid">
+        {% for mesa in mesas %}
+            {% if mesa.tipo == 'MESA' %}
+                {% if mesa.comanda %}
+                <!-- Mesa Ocupada -->
+                <a href="/comandas" class="mesa-card ocupada">
+                    <span class="mesa-icon">🍽️</span>
+                    <div class="mesa-numero">{{ mesa.label }}</div>
+                    <div class="mesa-status">Ocupada</div>
+                    <div class="mesa-action">Ver comanda →</div>
+                </a>
+                {% else %}
+                <!-- Mesa Libre -->
+                <a href="/venta_rapida?mesa={{ mesa.mesa }}" class="mesa-card libre">
+                    <span class="mesa-icon">🪑</span>
+                    <div class="mesa-numero">{{ mesa.label }}</div>
+                    <div class="mesa-status">Libre</div>
+                    <div class="mesa-action">Nueva comanda →</div>
+                </a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Para Llevar -->
+    <h2 class="section-title">🛍️ Para Llevar / Delivery</h2>
+    
+    <div class="mesas-grid">
+        {% for mesa in mesas %}
+            {% if mesa.tipo == 'LLEVAR' %}
+                {% if mesa.comanda %}
+                <a href="/comandas" class="mesa-card llevar ocupada">
+                    <span class="mesa-icon">🛍️</span>
+                    <div class="mesa-numero">{{ mesa.label }}</div>
+                    <div class="mesa-status">En proceso</div>
+                    <div class="mesa-action">Ver pedidos activos →</div>
+                </a>
+                {% else %}
+                <a href="/venta_rapida?tipo=LLEVAR" class="mesa-card llevar libre">
+                    <span class="mesa-icon">🛍️</span>
+                    <div class="mesa-numero">{{ mesa.label }}</div>
+                    <div class="mesa-status">Libre</div>
+                    <div class="mesa-action">Nuevo pedido →</div>
+                </a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions">
+        <a href="/venta_rapida" class="btn">
+            ➕ Nueva Venta Rápida
+        </a>
+        <a href="/" class="btn btn-secondary">
+            ⬅ Volver al Inicio
+        </a>
+    </div>
+
+</div>
+
+<script>
+// ===== SISTEMA DE TEMA =====
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    updateThemeIcon();
+    updateCounts();
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon();
+}
+
+function updateThemeIcon() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+}
+
+// ===== CONTADORES =====
+function updateCounts() {
+    const ocupadas = document.querySelectorAll('.mesa-card.ocupada').length;
+    const libres = document.querySelectorAll('.mesa-card.libre').length - document.querySelectorAll('.mesa-card.llevar').length;
+    
+    document.getElementById('count-busy').textContent = ocupadas;
+    document.getElementById('count-free').textContent = libres;
+}
+
+// ===== INICIALIZACIÓN =====
+document.addEventListener('DOMContentLoaded', initTheme);
+
+// Prevenir zoom
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) event.preventDefault();
+    lastTouchEnd = now;
+}, false);
+</script>
+
+</body>
+</html>

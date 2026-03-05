@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Gestión de Usuarios - Administración</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+:root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --surface: #ffffff;
+    --surface-hover: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --accent: #4f46e5;
+    --accent-hover: #4338ca;
+    --accent-light: #e0e7ff;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --radius: 10px;
+    --radius-lg: 16px;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --surface: #0f172a;
+    --surface-hover: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border: #1e293b;
+    --border-strong: #334155;
+    --accent: #6366f1;
+    --accent-light: #1e1b4b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+    padding-bottom: 100px;
+}
+
+.header {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.brand h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.connection-badge {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.connection-badge.online { background: rgba(16, 185, 129, 0.3); }
+.connection-badge.offline { background: rgba(239, 68, 68, 0.3); }
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    backdrop-filter: blur(10px);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.users-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 120px;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.user-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 120px;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.user-row:hover {
+    background: var(--bg-secondary);
+}
+
+.user-row:last-child {
+    border-bottom: none;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.user-id {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: fit-content;
+}
+
+.role-admin {
+    background: var(--danger-light);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+.role-cajero {
+    background: var(--success-light);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.role-cocina {
+    background: var(--warning-light);
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+.role-mesero {
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.user-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+}
+
+.user-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-action:hover {
+    transform: translateY(-1px);
+}
+
+.btn-action.edit {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-action.delete {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+@media (max-width: 768px) {
+    .table-header {
+        display: none;
+    }
+    
+    .user-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 20px;
+        margin-bottom: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+    }
+    
+    .user-actions {
+        justify-content: flex-end;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+    }
+    
+    .role-badge {
+        width: auto;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-tertiary);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.select-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.help-text {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-hover);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.perm-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.perm-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-primary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.alert {
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9375rem;
+}
+
+.alert-success {
+    background: var(--success-light);
+    color: #065f46;
+    border: 1px solid var(--success);
+}
+
+.alert-error {
+    background: var(--danger-light);
+    color: #991b1b;
+    border: 1px solid var(--danger);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-weight: 600;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+    font-size: 0.95rem;
+    background: var(--accent);
+    color: white;
+}
+
+@keyframes slideDown {
+    from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-content">
+        <div class="brand">
+            <div class="brand-icon">👥</div>
+            <div>
+                <h1>Gestión de Usuarios</h1>
+                <div style="font-size: 0.875rem; opacity: 0.9;">Administración del Sistema</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="connection-badge offline" id="connBadge">
+                <span style="font-size: 1.2rem;">📡</span>
+                <span id="connText">Offline</span>
+            </div>
+            <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+            <a href="/" class="btn-icon" title="Volver al inicio">✕</a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">
+            <span>{{ '✅' if category == 'success' else '⚠️' }}</span>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Usuarios</div>
+            <div class="stat-value">{{ usuarios|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Administradores</div>
+            <div class="stat-value" style="color: var(--danger);">
+                {{ usuarios|selectattr("rol", "equalto", "admin")|list|length }}
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Activos Hoy</div>
+            <div class="stat-value" style="color: var(--success);">
+                {{ usuarios|length }}
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h2 class="section-title">👤 Usuarios del Sistema</h2>
+        <button class="btn btn-primary" onclick="openModal('create')">
+            <span>+</span>
+            <span>Nuevo Usuario</span>
+        </button>
+    </div>
+
+    <div class="users-container">
+        {% if usuarios %}
+        <div class="table-header">
+            <div>Usuario</div>
+            <div>Rol</div>
+            <div>Estado</div>
+            <div>Acciones</div>
+        </div>
+        
+        {% for user in usuarios %}
+        <div class="user-row">
+            <div class="user-info">
+                <div class="user-avatar">
+                    {{ user.usuario[0]|upper }}
+                </div>
+                <div>
+                    <div class="user-name">{{ user.usuario }}</div>
+                    <div class="user-id">ID: {{ user.id }}</div>
+                </div>
+            </div>
+            
+            <div>
+                <span class="role-badge role-{{ user.rol }}">
+                    {{ user.rol|upper }}
+                </span>
+            </div>
+            
+            <div class="user-status">
+                <span class="status-dot"></span>
+                <span>Activo</span>
+            </div>
+            
+            <div class="user-actions">
+                <button class="btn-action edit" onclick='openEditModal({{ user.id|tojson }}, {{ user.usuario|tojson }}, {{ user.rol|tojson }})' title="Editar">
+                    ✏️
+                </button>
+                
+                {% if user.usuario != session.usuario %}
+                <button class="btn-action delete" onclick='confirmDelete({{ user.id|tojson }}, {{ user.usuario|tojson }})' title="Eliminar">
+                    🗑️
+                </button>
+                {% else %}
+                <button class="btn-action" style="opacity: 0.3; cursor: not-allowed;" title="No puedes eliminarte">
+                    🚫
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">👤</div>
+            <h3>No hay usuarios registrados</h3>
+            <p>Comienza creando el primer usuario del sistema</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<div id="modal-create" class="modal-overlay">
+    <div class="modal">
+        <form method="post" action="/admin/usuarios/crear">
+            <div class="modal-header">
+                <h3 class="modal-title">➕ Nuevo Usuario</h3>
+                <button type="button" class="modal-close" onclick="closeModal('create')">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nombre de Usuario *</label>
+                    <input type="text" name="usuario" class="input-field" required 
+                           pattern="[a-zA-Z0-9_]{3,20}" 
+                           title="3-20 caracteres, solo letras, números y guión bajo">
+                    <div class="help-text">Ejemplo: juan_perez, admin2024, cajera1</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Contraseña *</label>
+                    <input type="password" name="password" class="input-field" required 
+                           minlength="4" placeholder="Mínimo 4 caracteres">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Rol del Sistema *</label>
+                    <select name="rol" class="select-field" required onchange="updatePermisos(this.value)">
+                        <option value="">Seleccionar rol...</option>
+                        <option value="admin">👑 Administrador (Acceso Total)</option>
+                        <option value="cajero">💰 Cajero (Ventas y Corte)</option>
+                        <option value="cocina">👨‍🍳 Cocina (Solo Órdenes)</option>
+                        <option value="mesero">🍽️ Mesero (Comandas y Ventas)</option>
+                    </select>
+                    <div class="help-text" id="perm-desc">Selecciona un rol para ver permisos</div>
+                </div>
+                
+                <div class="perm-grid" id="permisos-preview" style="display: none; margin-top: 16px;"></div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('create')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Crear Usuario</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modal-edit" class="modal-overlay">
+    <div class="modal">
+        <form method="post" action="/admin/usuarios/editar">
+            <input type="hidden" name="user_id" id="edit-user-id">
+            
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Editar Usuario</h3>
+                <button type="button" class="modal-close" onclick="closeModal('edit')">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" id="edit-usuario-display" class="input-field" disabled style="background: var(--bg-secondary);">
+                    <input type="hidden" name="usuario" id="edit-usuario">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nueva Contraseña (dejar en blanco para mantener)</label>
+                    <input type="password" name="password" class="input-field" 
+                           minlength="4" placeholder="••••••">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Rol del Sistema</label>
+                    <select name="rol" id="edit-rol" class="select-field" required>
+                        <option value="admin">👑 Administrador</option>
+                        <option value="cajero">💰 Cajero</option>
+                        <option value="cocina">👨‍🍳 Cocina</option>
+                        <option value="mesero">🍽️ Mesero</option>
+                    </select>
+                </div>
+                
+                <div class="alert alert-error" style="margin-top: 16px; font-size: 0.875rem;">
+                    <span>⚠️</span>
+                    <span>Si cambias tu propio rol a uno sin permisos de administrador, perderás acceso a esta sección.</span>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('edit')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modal-delete" class="modal-overlay">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3 class="modal-title">🗑️ Confirmar Eliminación</h3>
+            <button type="button" class="modal-close" onclick="closeModal('delete')">×</button>
+        </div>
+        
+        <div class="modal-body">
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+                ¿Estás seguro de eliminar al usuario <strong id="delete-user-name" style="color: var(--text-primary);"></strong>?
+            </p>
+            <p style="color: var(--danger); font-size: 0.875rem; margin-top: 12px;">
+                Esta acción no se puede deshacer.
+            </p>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('delete')">Cancelar</button>
+            <form method="post" action="/admin/usuarios/eliminar" style="display: inline;">
+                <input type="hidden" name="user_id" id="delete-user-id">
+                <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+const PERMISOS = {
+    admin: {
+        desc: "Control total del sistema: usuarios, finanzas, configuración",
+        perms: ["✅ Todas las funciones", "✅ Gestión de usuarios", "✅ Reportes completos", "✅ Configuración del sistema"]
+    },
+    cajero: {
+        desc: "Manejo de ventas, cortes de caja y comandas",
+        perms: ["✅ Punto de venta", "✅ Corte de caja", "✅ Historial de ventas", "❌ Gestión de usuarios", "❌ Apartados avanzados"]
+    },
+    cocina: {
+        desc: "Solo acceso a la pantalla de cocina para preparar órdenes",
+        perms: ["✅ Pantalla de cocina", "✅ Marcar órdenes listas", "❌ Ventas", "❌ Precios", "❌ Corte"]
+    },
+    mesero: {
+        desc: "Toma de órdenes y ventas rápidas",
+        perms: ["✅ Tomar comandas", "✅ Venta rápida", "✅ Ver mesas", "❌ Corte de caja", "❌ Modificar precios"]
+    }
+};
+
+let socket = null;
+
+function initTheme() {
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+    } else if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.btn-icon').forEach(btn => {
+        if (btn.textContent === '🌙' || btn.textContent === '☀️') {
+            btn.textContent = isDark ? '☀️' : '🌙';
+        }
+    });
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    
+    const btn = document.querySelector('.btn-icon[onclick="toggleTheme()"]');
+    if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+function initSync() {
+    try {
+        socket = io(window.location.origin);
+        
+        socket.on('connect', () => {
+            console.log('✅ Conectado');
+            updateConnectionStatus(true);
+        });
+        
+        socket.on('disconnect', () => {
+            updateConnectionStatus(false);
+        });
+        
+    } catch(e) {
+        console.log('Modo offline');
+        updateConnectionStatus(false);
+    }
+}
+
+function updateConnectionStatus(connected) {
+    const badge = document.getElementById('connBadge');
+    const text = document.getElementById('connText');
+    
+    if (connected) {
+        badge.classList.remove('offline');
+        badge.classList.add('online');
+        text.textContent = 'Online';
+    } else {
+        badge.classList.remove('online');
+        badge.classList.add('offline');
+        text.textContent = 'Offline';
+    }
+}
+
+function openModal(type) {
+    document.getElementById(`modal-${type}`).classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(type) {
+    document.getElementById(`modal-${type}`).classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function openEditModal(id, usuario, rol) {
+    document.getElementById('edit-user-id').value = id;
+    document.getElementById('edit-usuario').value = usuario;
+    document.getElementById('edit-usuario-display').value = usuario;
+    document.getElementById('edit-rol').value = rol;
+    openModal('edit');
+}
+
+function confirmDelete(id, usuario) {
+    document.getElementById('delete-user-id').value = id;
+    document.getElementById('delete-user-name').textContent = usuario;
+    openModal('delete');
+}
+
+function updatePermisos(rol) {
+    const desc = document.getElementById('perm-desc');
+    const preview = document.getElementById('permisos-preview');
+    
+    if (!rol) {
+        desc.textContent = "Selecciona un rol para ver permisos";
+        preview.style.display = 'none';
+        return;
+    }
+    
+    const config = PERMISOS[rol];
+    desc.textContent = config.desc;
+    
+    preview.innerHTML = config.perms.map(p => `
+        <div class="perm-item">
+            <span>${p}</span>
+        </div>
+    `).join('');
+    
+    preview.style.display = 'grid';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initSync();
+});
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(e) {
+    const now = new Date().getTime();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+}, false);
+</script>
+
+</body>
+</html>
