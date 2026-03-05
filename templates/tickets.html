@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Consulta de tickets</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>🧾 Consulta de tickets</h1>
+
+<form method="get" class="card">
+    <label>Categoría</label>
+    <select name="categoria">
+        <option value="">Todas</option>
+        {% for c in categorias %}
+        <option value="{{c}}" {% if c==categoria_sel %}selected{% endif %}>{{c}}</option>
+        {% endfor %}
+    </select>
+
+    <label>Fecha</label>
+    <input type="date" name="fecha" value="{{fecha_sel}}">
+
+    <button class="btn-principal">🔍 Filtrar</button>
+    <a href="/tickets" class="btn-neutral">Limpiar</a>
+</form>
+
+<div class="card">
+<table width="100%">
+<tr>
+    <th>Fecha</th>
+    <th>Categoría</th>
+    <th>Monto</th>
+    <th>Nota</th>
+    <th></th>
+</tr>
+
+{% for t in tickets %}
+<tr>
+    <td>{{t[1]}}</td>
+    <td>{{t[2]}}</td>
+    <td>${{ "%.2f"|format(t[3]) }}</td>
+    <td>{{t[5]}}</td>
+    <td>
+        <form method="post" action="/eliminar_ticket/{{t[0]}}"
+              onsubmit="return confirm('¿Eliminar este ticket?')">
+            <button class="btn-rojo">🗑</button>
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="card total-bar">
+    Total mostrado: ${{ "%.2f"|format(total) }}
+</div>
+
+<a href="/control" class="btn-neutral">⬅ Volver al control</a>
+
+</body>
+</html>

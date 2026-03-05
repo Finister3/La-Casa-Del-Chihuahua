@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Control Financiero - La Casa Del Chihuahua</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#4f46e5">
+
+<style>
+:root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --surface: #ffffff;
+    --surface-hover: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --accent: #4f46e5;
+    --accent-light: #e0e7ff;
+    --accent-hover: #4338ca;
+    --success: #10b981;
+    --success-bg: #d1fae5;
+    --danger: #ef4444;
+    --danger-bg: #fee2e2;
+    --warning: #f59e0b;
+    --warning-bg: #fef3c7;
+    --info: #3b82f6;
+    --info-bg: #dbeafe;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --radius-sm: 6px;
+    --radius: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --surface: #0f172a;
+    --surface-hover: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border: #1e293b;
+    --border-strong: #334155;
+    --accent: #6366f1;
+    --accent-light: #1e1b4b;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg-primary: #020617;
+        --bg-secondary: #0f172a;
+        --surface: #0f172a;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --border: #1e293b;
+        --accent: #6366f1;
+        --accent-light: #1e1b4b;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.brand h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.brand span {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+/* ===== CONTAINER ===== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 20px;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+/* ===== FILTER CARD ===== */
+.filter-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+@media (min-width: 640px) {
+    .filter-form {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.form-input {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.btn {
+    padding: 10px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+
+/* ===== KPI GRID ===== */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .kpi-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+    }
+}
+
+.kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+}
+
+.kpi-card.success::before { background: var(--success); }
+.kpi-card.danger::before { background: var(--danger); }
+.kpi-card.warning::before { background: var(--warning); }
+.kpi-card.info::before { background: var(--info); }
+
+.kpi-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
+    letter-spacing: -0.02em;
+}
+
+.kpi-value.positive { color: var(--success); }
+.kpi-value.negative { color: var(--danger); }
+
+/* ===== CHARTS ===== */
+.chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.chart-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .charts-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+    }
+    
+    .chart-container {
+        height: 280px;
+    }
+}
+
+/* ===== APARTADOS SECTION ===== */
+.apartados-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+@media (min-width: 640px) {
+    .apartados-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.apartado-item {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: all 0.2s;
+}
+
+.apartado-item:hover {
+    border-color: var(--border-strong);
+    transform: translateX(4px);
+}
+
+.apartado-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.apartado-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.apartado-icon {
+    font-size: 1.25rem;
+}
+
+.apartado-amounts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.progress-bar-bg {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progress-bar-fill.success { background: var(--success); }
+.progress-bar-fill.warning { background: var(--warning); }
+.progress-bar-fill.danger { background: var(--danger); }
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* ===== TABLE ===== */
+.table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.table th {
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.table tr:hover td {
+    background: var(--bg-secondary);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.amount {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+/* ===== ACTIONS ===== */
+.actions-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ===== UTILS ===== */
+.hidden { display: none; }
+.text-right { text-align: right; }
+.font-mono { font-family: 'Courier New', monospace; }
+
+/* ===== QUICK ADD EXPENSE ===== */
+.quick-add-card {
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--surface) 100%);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.quick-add-form {
+    display: grid;
+    gap: 12px;
+}
+
+@media (min-width: 640px) {
+    .quick-add-form {
+        grid-template-columns: 1fr 1fr auto;
+        align-items: end;
+    }
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.badge-warning {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.badge-danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <div class="brand">
+            <div class="brand-icon">📊</div>
+            <div>
+                <h1>Control Financiero</h1>
+                <span>Panel de Administración</span>
+            </div>
+        </div>
+        <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- FILTRO DE FECHAS -->
+    <section class="section">
+        <div class="filter-card">
+            <form method="get" class="filter-form">
+                <div class="form-group">
+                    <label class="form-label">📅 Fecha Inicio</label>
+                    <input type="date" name="inicio" value="{{ fecha_inicio }}" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📅 Fecha Fin</label>
+                    <input type="date" name="fin" value="{{ fecha_fin }}" class="form-input">
+                </div>
+                <button type="submit" class="btn">
+                    🔍 Consultar
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="kpi-grid">
+        <div class="kpi-card success">
+            <div class="kpi-label">Ventas Totales</div>
+            <div class="kpi-value">${{ "%.2f"|format(ventas_total) }}</div>
+        </div>
+        
+        <div class="kpi-card danger">
+            <div class="kpi-label">Gastos Totales</div>
+            <div class="kpi-value">${{ "%.2f"|format(gastos_total) }}</div>
+        </div>
+        
+        <div class="kpi-card warning">
+            <div class="kpi-label">Gastos Fijos</div>
+            <div class="kpi-value">${{ "%.2f"|format(gastos_fijos) }}</div>
+        </div>
+        
+        <div class="kpi-card info">
+            <div class="kpi-label">Gastos Variables</div>
+            <div class="kpi-value">${{ "%.2f"|format(gastos_variables) }}</div>
+        </div>
+        
+        <div class="kpi-card" style="grid-column: span 2; {% if utilidad >= 0 %}--accent: var(--success){% else %}--accent: var(--danger){% endif %}">
+            <div class="kpi-label">Utilidad Neta</div>
+            <div class="kpi-value {% if utilidad >= 0 %}positive{% else %}negative{% endif %}">
+                ${{ "%.2f"|format(utilidad) }}
+            </div>
+        </div>
+    </section>
+
+    <!-- APARTADOS SEMANALES -->
+    <section class="section">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">📦 Apartados Semanales</h3>
+                <a href="/apartados" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.875rem;">
+                    Gestionar →
+                </a>
+            </div>
+            
+            {% if apartados %}
+            <div class="apartados-grid">
+                {% for ap in apartados %}
+                {% set porcentaje = (ap.gastado / ap.presupuesto * 100) if ap.presupuesto > 0 else 0 %}
+                {% set estado = 'danger' if porcentaje > 100 else 'warning' if porcentaje > 75 else 'success' %}
+                
+                <div class="apartado-item" style="border-left: 4px solid var(--{{ estado }});">
+                    <div class="apartado-header">
+                        <div class="apartado-name">
+                            <span class="apartado-icon">
+                                {% if 'Gas' in ap.nombre %}⛽{% elif 'Luz' in ap.nombre %}💡{% elif 'Internet' in ap.nombre %}📶{% elif 'Agua' in ap.nombre %}💧{% elif 'Surtido' in ap.nombre %}📦{% elif 'Credito' in ap.nombre %}💳{% elif 'Derek' in ap.nombre %}👤{% else %}📋{% endif %}
+                            </span>
+                            {{ ap.nombre }}
+                        </div>
+                        <span class="badge badge-{{ estado }}">
+                            {{ "%.0f"|format(porcentaje) }}%
+                        </span>
+                    </div>
+                    
+                    <div class="apartado-amounts">
+                        <span>Gastado: ${{ "%.0f"|format(ap.gastado) }}</span>
+                        <span style="color: var(--{{ estado }}); font-weight: 600;">
+                            ${{ "%.0f"|format(ap.restante) }} restante
+                        </span>
+                    </div>
+                    
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill {{ estado }}" 
+                             style="width: {{ porcentaje if porcentaje <= 100 else 100 }}%;">
+                        </div>
+                    </div>
+                    
+                    <div class="progress-labels">
+                        <span>Presupuesto: ${{ "%.0f"|format(ap.presupuesto) }}</span>
+                        <span>{{ "%.1f"|format(porcentaje) }}% usado</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <p>No hay apartados configurados</p>
+                <a href="/apartados" class="btn" style="margin-top: 12px;">Configurar Apartados</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- GRÁFICAS -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">📈 Ventas vs Gastos vs Utilidad</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartComparativa"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">🎯 Distribución de Gastos</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartDistribucion"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA DE GASTOS -->
+    <section class="section">
+        <div class="table-card">
+            <h3 class="section-title">🧾 Gastos por Categoría</h3>
+            
+            {% if gastos_por_categoria %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th class="text-right">Monto</th>
+                        <th class="text-right">%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set total_gastos = gastos_total or 1 %}
+                    {% for g in gastos_por_categoria %}
+                    <tr>
+                        <td>
+                            <strong>{{ g.categoria }}</strong>
+                        </td>
+                        <td class="text-right amount">
+                            ${{ "%.2f"|format(g.total) }}
+                        </td>
+                        <td class="text-right">
+                            <span style="display: inline-block; padding: 4px 8px; background: var(--accent-light); color: var(--accent); border-radius: 20px; font-size: 0.875rem; font-weight: 600;">
+                                {{ "%.1f"|format((g.total / total_gastos) * 100) }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p>No hay gastos registrados en este período</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- ACCIONES -->
+    <section class="section">
+        <div class="actions-grid">
+            <a href="/tickets" class="btn">
+                📂 Ver Tickets de Gastos
+            </a>
+            <a href="/gastos" class="btn btn-secondary">
+                ➕ Registrar Gasto
+            </a>
+            <a href="/historial_cortes" class="btn btn-secondary">
+                📅 Historial Cortes
+            </a>
+            <a href="/" class="btn btn-secondary">
+                ⬅ Volver al Inicio
+            </a>
+        </div>
+    </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// ===== SISTEMA DE TEMA =====
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    updateThemeIcon();
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon();
+    updateChartsTheme();
+}
+
+function updateThemeIcon() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+}
+
+// ===== GRÁFICAS DINÁMICAS =====
+let chartComparativa, chartDistribucion;
+
+function getChartColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+        text: isDark ? '#94a3b8' : '#475569',
+        grid: isDark ? '#1e293b' : '#e2e8f0',
+        surface: isDark ? '#0f172a' : '#ffffff'
+    };
+}
+
+function initCharts() {
+    const colors = getChartColors();
+    
+    // Gráfica Comparativa (Barras Verticales)
+    const ctxComp = document.getElementById('chartComparativa').getContext('2d');
+    chartComparativa = new Chart(ctxComp, {
+        type: 'bar',
+        data: {
+            labels: ['Ventas', 'Gastos', 'Utilidad'],
+            datasets: [{
+                label: 'Monto ($)',
+                data: [{{ ventas_total }}, {{ gastos_total }}, {{ utilidad }}],
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(239, 68, 68, 0.8)',
+                    {{ utilidad }} >= 0 ? 'rgba(59, 130, 246, 0.8)' : 'rgba(239, 68, 68, 0.8)'
+                ],
+                borderColor: [
+                    'rgb(16, 185, 129)',
+                    'rgb(239, 68, 68)',
+                    {{ utilidad }} >= 0 ? 'rgb(59, 130, 246)' : 'rgb(239, 68, 68)'
+                ],
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: colors.surface,
+                    titleColor: colors.text,
+                    bodyColor: colors.text,
+                    borderColor: colors.grid,
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return '$ ' + context.parsed.y.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: colors.grid,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: colors.text,
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: colors.text,
+                        font: {
+                            weight: '600'
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfica Distribución (Doughnut)
+    const ctxDist = document.getElementById('chartDistribucion').getContext('2d');
+    const gastosFijos = {{ gastos_fijos }};
+    const gastosVars = {{ gastos_variables }};
+    
+    chartDistribucion = new Chart(ctxDist, {
+        type: 'doughnut',
+        data: {
+            labels: ['Fijos', 'Variables'],
+            datasets: [{
+                data: [gastosFijos, gastosVars],
+                backgroundColor: [
+                    'rgba(245, 158, 11, 0.8)',
+                    'rgba(59, 130, 246, 0.8)'
+                ],
+                borderColor: [
+                    'rgb(245, 158, 11)',
+                    'rgb(59, 130, 246)'
+                ],
+                borderWidth: 2,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: colors.text,
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: colors.surface,
+                    titleColor: colors.text,
+                    bodyColor: colors.text,
+                    borderColor: colors.grid,
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            const total = gastosFijos + gastosVars;
+                            const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                            return context.label + ': $' + context.parsed.toFixed(2) + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateChartsTheme() {
+    const colors = getChartColors();
+    
+    [chartComparativa, chartDistribucion].forEach(chart => {
+        if (chart) {
+            if (chart.options.scales.x) {
+                chart.options.scales.x.ticks.color = colors.text;
+            }
+            if (chart.options.scales.y) {
+                chart.options.scales.y.ticks.color = colors.text;
+                chart.options.scales.y.grid.color = colors.grid;
+            }
+            chart.options.plugins.tooltip.backgroundColor = colors.surface;
+            chart.options.plugins.tooltip.titleColor = colors.text;
+            chart.options.plugins.tooltip.bodyColor = colors.text;
+            chart.options.plugins.tooltip.borderColor = colors.grid;
+            if (chart.options.plugins.legend) {
+                chart.options.plugins.legend.labels.color = colors.text;
+            }
+            chart.update();
+        }
+    });
+}
+
+// ===== INICIALIZACIÓN =====
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initCharts();
+});
+
+// Prevenir zoom en móvil
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Catálogo de Insumos - La Casa Del Chihuahua</title>
+<style>
+:root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --text-sec: #64748b;
+    --accent: #4f46e5;
+    --accent-light: #e0e7ff;
+    --danger: #ef4444;
+    --success: #10b981;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
+    --text: #f1f5f9;
+    --text-sec: #94a3b8;
+    --accent-light: #1e1b4b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding-bottom: 100px; /* espacio para FAB */
+}
+
+/* Header minimalista */
+.header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    color: var(--text-sec);
+}
+
+.btn-back {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-sec);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* Barra de búsqueda y filtros */
+.controls {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 14px 44px 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.search-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-sec);
+    font-size: 1.25rem;
+}
+
+/* Filtros de categoría (chips) */
+.filters {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    padding: 8px 16px;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-sec);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.chip.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.chip .count {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* Grid de insumos */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+@media (max-width: 640px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tarjeta de insumo */
+.insumo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+
+.insumo-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--accent);
+}
+
+.insumo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.insumo-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    padding-right: 30px;
+}
+
+.insumo-cat {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-menu {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-sec);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.btn-menu:hover {
+    background: var(--bg);
+}
+
+.insumo-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    color: var(--text-sec);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detail-value {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-sec);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 50;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+}
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: var(--surface);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+    padding: 24px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: var(--bg);
+    color: var(--text-sec);
+    cursor: pointer;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-submit:hover {
+    background: #4338ca;
+}
+
+.btn-delete {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 10px;
+    border: 1px solid #fee2e2;
+    background: #fef2f2;
+    color: var(--danger);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Toast notifications */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--text);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 200;
+    box-shadow: var(--shadow-lg);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.success {
+    background: var(--success);
+}
+
+.toast.error {
+    background: var(--danger);
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-content">
+        <div>
+            <h1>📦 Catálogo de Insumos</h1>
+            <div class="subtitle">Gestiona tu inventario base</div>
+        </div>
+        <a href="/inventario" class="btn-back">← Operación</a>
+    </div>
+</div>
+
+<div class="controls">
+    <div class="search-box">
+        <input type="text" 
+               id="searchInput" 
+               placeholder="Buscar insumo..." 
+               value="{{ busqueda }}"
+               onkeyup="handleSearch(this.value)">
+        <span class="search-icon">🔍</span>
+    </div>
+    
+    <div class="filters">
+        <a href="/catalogo_insumos" class="chip {% if not filtro_cat %}active{% endif %}">
+            Todos <span class="count">{{ total_insumos }}</span>
+        </a>
+        {% for cat in categorias %}
+        <a href="/catalogo_insumos?categoria={{ cat.categoria }}" 
+           class="chip {% if filtro_cat == cat.categoria %}active{% endif %}">
+            {{ cat.categoria }} <span class="count">{{ cat.total }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container">
+    {% if insumos %}
+    <div class="grid" id="insumosGrid">
+        {% for i in insumos %}
+        <div class="insumo-card" onclick="editarInsumo({{ i.id }}, '{{ i.nombre }}', '{{ i.categoria }}', '{{ i.unidad_medida }}', {{ i.stock_minimo }})">
+            <button class="btn-menu" onclick="event.stopPropagation(); editarInsumo({{ i.id }}, '{{ i.nombre }}', '{{ i.categoria }}', '{{ i.unidad_medida }}', {{ i.stock_minimo }})">⋮</button>
+            
+            <div class="insumo-header">
+                <div>
+                    <div class="insumo-title">{{ i.nombre }}</div>
+                    <span class="insumo-cat">{{ i.categoria }}</span>
+                </div>
+            </div>
+            
+            <div class="insumo-details">
+                <div class="detail">
+                    <span class="detail-label">Unidad</span>
+                    <span class="detail-value">{{ i.unidad_medida }}</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Stock Mínimo</span>
+                    <span class="detail-value">{{ i.stock_minimo }}</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Stock Actual</span>
+                    <span class="detail-value" style="color: {% if i.stock_actual <= i.stock_minimo %}var(--danger){% else %}var(--success){% endif %}">
+                        {{ "%.1f"|format(i.stock_actual) }}
+                    </span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Costo Aprox.</span>
+                    <span class="detail-value">${{ "%.2f"|format(i.costo_unitario or 0) }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">No hay insumos registrados</div>
+        <p>Comienza agregando tu primer producto al inventario</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- FAB para agregar -->
+<button class="fab" onclick="abrirModal('modalNuevo')">+</button>
+
+<!-- Modal Nuevo Insumo -->
+<div class="modal-overlay" id="modalNuevo">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Nuevo Insumo</h3>
+            <button class="modal-close" onclick="cerrarModal('modalNuevo')">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="formNuevo" onsubmit="guardarNuevo(event)">
+                <div class="form-group">
+                    <label>Nombre del insumo *</label>
+                    <input type="text" name="nombre" required placeholder="Ej: Tortilla de Harina">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select name="categoria" required>
+                            <option value="">Selecciona...</option>
+                            {% for cat in categorias_disponibles %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unidad *</label>
+                        <select name="unidad_medida" required>
+                            {% for uni in unidades %}
+                            <option value="{{ uni }}" {% if uni == 'piezas' %}selected{% endif %}>{{ uni }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stock Mínimo *</label>
+                        <input type="number" step="0.1" name="stock_minimo" value="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Costo Unitario ($)</label>
+                        <input type="number" step="0.01" name="costo_unitario" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit">Crear Insumo</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal-overlay" id="modalEditar">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Editar Insumo</h3>
+            <button class="modal-close" onclick="cerrarModal('modalEditar')">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="formEditar" onsubmit="guardarEdicion(event)">
+                <input type="hidden" id="editId">
+                
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="editNombre" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="editCategoria" required>
+                            {% for cat in categorias_disponibles %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unidad</label>
+                        <select id="editUnidad" required>
+                            {% for uni in unidades %}
+                            <option value="{{ uni }}">{{ uni }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Stock Mínimo de alerta</label>
+                    <input type="number" step="0.1" id="editMinimo" required>
+                </div>
+                
+                <button type="submit" class="btn-submit">Guardar Cambios</button>
+                <button type="button" class="btn-delete" onclick="eliminarInsumo()">🗑️ Eliminar Insumo</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let insumoEditando = null;
+
+function handleSearch(value) {
+    // Debounce simple
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(() => {
+        if (value.length > 2 || value.length === 0) {
+            const url = new URL(window.location);
+            if (value) {
+                url.searchParams.set('q', value);
+            } else {
+                url.searchParams.delete('q');
+            }
+            window.location.href = url.toString();
+        }
+    }, 500);
+}
+
+function abrirModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function cerrarModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+async function guardarNuevo(e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+        nombre: form.nombre.value,
+        categoria: form.categoria.value,
+        unidad_medida: form.unidad_medida.value,
+        stock_minimo: parseFloat(form.stock_minimo.value),
+        costo_unitario: parseFloat(form.costo_unitario.value) || 0
+    };
+    
+    try {
+        const res = await fetch('/inventario/nuevo', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams(data)
+        });
+        
+        if (res.ok) {
+            showToast('✅ Insumo creado correctamente');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast('❌ Error al crear insumo', 'error');
+        }
+    } catch (err) {
+        showToast('❌ Error de conexión', 'error');
+    }
+}
+
+function editarInsumo(id, nombre, categoria, unidad, minimo) {
+    insumoEditando = id;
+    document.getElementById('editId').value = id;
+    document.getElementById('editNombre').value = nombre;
+    document.getElementById('editCategoria').value = categoria;
+    document.getElementById('editUnidad').value = unidad;
+    document.getElementById('editMinimo').value = minimo;
+    abrirModal('modalEditar');
+}
+
+async function guardarEdicion(e) {
+    e.preventDefault();
+    
+    const data = {
+        nombre: document.getElementById('editNombre').value,
+        categoria: document.getElementById('editCategoria').value,
+        unidad_medida: document.getElementById('editUnidad').value,
+        stock_minimo: parseFloat(document.getElementById('editMinimo').value)
+    };
+    
+    try {
+        const res = await fetch(`/api/insumos/${insumoEditando}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            showToast('✅ Cambios guardados');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast('❌ ' + result.error, 'error');
+        }
+    } catch (err) {
+        showToast('❌ Error al guardar', 'error');
+    }
+}
+
+async function eliminarInsumo() {
+    if (!confirm('¿Eliminar este insumo? Se desactivará pero no perderás el historial.')) return;
+    
+    try {
+        const res = await fetch(`/api/insumos/${insumoEditando}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            showToast('🗑️ Insumo eliminado');
+            setTimeout(() => location.reload(), 500);
+        }
+    } catch (err) {
+        showToast('❌ Error al eliminar', 'error');
+    }
+}
+
+// Cerrar modales al hacer click fuera
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+});
+</script>
+
+</body>
+</html>

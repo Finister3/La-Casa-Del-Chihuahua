@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Ventas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .contenedor {
+            max-width: 520px;
+            margin: auto;
+            padding: 10px;
+        }
+
+        .venta-card {
+            background: linear-gradient(145deg, #3b2a21, #241812);
+            color: #fff;
+            padding: 18px;
+            margin-bottom: 22px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.45);
+        }
+
+        .venta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .venta-id {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .venta-fecha {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .venta-total {
+            font-size: 24px;
+            color: #ffd54f;
+            font-weight: bold;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #6a5547;
+            font-size: 17px;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .acciones {
+            margin-top: 15px;
+        }
+
+        .btn-danger {
+            width: 100%;
+            padding: 10px;
+            background: #c0392b;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background: #a93226;
+        }
+
+        .volver {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            font-size: 18px;
+            color: #cfa85c;
+            text-decoration: none;
+        }
+
+        .volver:hover {
+            text-decoration: underline;
+        }
+
+        .sin-ventas {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 40px;
+            color: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>💰 Ventas</h1>
+</div>
+
+<div class="contenedor">
+
+{% if ventas|length == 0 %}
+    <p class="sin-ventas">
+        No hay ventas registradas
+    </p>
+{% endif %}
+
+{% for v in ventas %}
+<div class="venta-card">
+
+    <div class="venta-header">
+        <div>
+            <div class="venta-id">🧾 Venta #{{ v["id"] }}</div>
+            <div class="venta-fecha">{{ v["fecha"] }}</div>
+        </div>
+        <div class="venta-total">
+            ${{ "%.2f"|format(v["total"]) }}
+        </div>
+    </div>
+
+    <hr style="border-color:#5a463a;margin:12px 0">
+
+    {% if v["items"] %}
+        {% for i in v["items"] %}
+        <div class="item">
+            <span>{{ i["nombre"] }} × {{ i["cantidad"] }}</span>
+            <strong>${{ "%.2f"|format(i["subtotal"]) }}</strong>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="font-size:15px;color:#ccc">
+            (Detalle no disponible)
+        </p>
+    {% endif %}
+
+    <!-- ACCIONES -->
+    <div class="acciones">
+        <form action="/eliminar_venta/{{ v['id'] }}" method="POST"
+              onsubmit="return confirm('¿Eliminar esta venta de prueba?');">
+            <button type="submit" class="btn-danger">
+                🗑 Eliminar venta
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endfor %}
+
+<a href="/" class="volver">
+⬅ Volver al menú
+</a>
+
+</div>
+
+</body>
+</html>
