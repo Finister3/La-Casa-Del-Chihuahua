@@ -9,50 +9,75 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap');
+
 :root {
-    --bg-primary: #f8fafc;
-    --bg-secondary: #f1f5f9;
+    --bg-primary: #f5f6f8;
+    --bg-secondary: #eceef2;
     --surface: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-tertiary: #94a3b8;
-    --accent: #4f46e5;
-    --accent-light: #e0e7ff;
-    --success: #10b981;
+    --text-primary: #101216;
+    --text-secondary: #535865;
+    --text-tertiary: #7b8190;
+    --accent: #e53935;
+    --accent-light: rgba(229, 57, 53, 0.2);
+    --success: #16a34a;
     --warning: #f59e0b;
     --warning-light: #fef3c7;
     --danger: #ef4444;
-    --border: #e2e8f0;
-    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    --border: #d7dce4;
+    --shadow: 0 4px 16px 0 rgb(15 23 42 / 0.09);
     --radius: 12px;
     --radius-lg: 16px;
+    --order-glow: 0 0 0 3px rgba(229, 57, 53, 0.25);
+    --bg-glow-a: rgba(239, 68, 68, 0.08);
+    --bg-glow-b: rgba(190, 18, 60, 0.07);
 }
 
 [data-theme="dark"] {
-    --bg-primary: #020617;
-    --bg-secondary: #0f172a;
-    --surface: #0f172a;
+    --bg-primary: #09090a;
+    --bg-secondary: #131316;
+    --surface: #18181b;
     --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-tertiary: #64748b;
-    --border: #1e293b;
-    --accent: #6366f1;
+    --text-secondary: #c5c5cc;
+    --text-tertiary: #8e8e95;
+    --border: #2a2a30;
+    --accent: #f04440;
+    --bg-glow-a: rgba(239, 68, 68, 0.16);
+    --bg-glow-b: rgba(225, 29, 72, 0.14);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.2s, border-color 0.2s; }
 body { 
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-    background: var(--bg-primary); 
+    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    background:
+        radial-gradient(circle at 10% 0%, var(--bg-glow-a) 0%, transparent 38%),
+        radial-gradient(circle at 90% 10%, var(--bg-glow-b) 0%, transparent 32%),
+        var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
-    padding-bottom: 100px;
+    min-height: 100dvh;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+button,
+.btn-icon,
+.quick-btn,
+.qty-btn,
+.chip,
+.sabor-chip,
+.guisado-item,
+.category-nav-btn,
+.btn-confirm,
+.line-btn {
+    touch-action: manipulation;
 }
 
 .header {
-    background: linear-gradient(135deg, var(--accent) 0%, #4338ca 100%);
+    background: linear-gradient(135deg, #c91f2a 0%, #a8121e 100%);
     color: white;
-    padding: 12px 16px;
+    padding: 10px 14px;
     position: sticky;
+    overflow: hidden;
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
@@ -61,41 +86,236 @@ body {
     align-items: center;
 }
 
-.header h1 { font-size: 1.1rem; font-weight: 700; }
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+}
+
+.header h1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    font-family: 'Baloo 2', 'Manrope', sans-serif;
+    letter-spacing: 0.02em;
+}
 .btn-icon {
-    width: 36px; height: 36px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);
+    width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.35);
     background: rgba(255,255,255,0.1); color: white; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.2rem;
 }
 
+.quick-toolbar {
+    padding: 8px 12px 4px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.12), transparent);
+}
+
+.quick-actions {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.quick-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.quick-btn:hover { border-color: var(--accent); box-shadow: var(--order-glow); }
+
+.quick-btn:active {
+    transform: translateY(1px);
+}
+
+.kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 8px;
+    box-shadow: var(--shadow);
+}
+
+.kpi-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.kpi-value { font-size: 0.9rem; font-weight: 700; margin-top: 2px; }
+
+.ops-status {
+    margin: 0 12px 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.ops-pill {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.ops-pill.ok { background: rgba(22, 163, 74, 0.14); color: #166534; }
+.ops-pill.warn { background: rgba(245, 158, 11, 0.16); color: #92400e; }
+.ops-pill.off { background: rgba(239, 68, 68, 0.16); color: #991b1b; }
+
+.speed-strip {
+    margin: 0 12px 10px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+}
+
+.speed-title {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.speed-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.speed-chip {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 11px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.speed-chip:hover { border-color: var(--accent); }
+.speed-chip.combo { background: var(--accent-light); color: var(--accent); }
+
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn-icon.active {
+    background: rgba(255,255,255,0.95);
+    color: #b91c1c;
+    border-color: rgba(255,255,255,0.95);
+}
+
 .search-bar {
     position: sticky; top: 60px; z-index: 90;
-    background: var(--bg-primary); padding: 12px 16px;
+    background: var(--bg-primary); padding: 8px 12px;
     border-bottom: 1px solid var(--border);
 }
 .search-input {
-    width: 100%; padding: 14px 18px; border: 2px solid var(--border);
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border);
     border-radius: var(--radius-lg); background: var(--surface);
     color: var(--text-primary); font-size: 1rem;
 }
 .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
 
+.category-nav {
+    display: none;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 12px;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border);
+}
+
+.category-nav-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.category-nav-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
 .order-info {
-    background: var(--surface); margin: 16px; padding: 16px;
+    background: var(--surface); margin: 10px 12px; padding: 12px;
     border-radius: var(--radius-lg); border: 1px solid var(--border);
     box-shadow: var(--shadow);
 }
-.order-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: center; }
+.order-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
 .order-row:last-child { margin-bottom: 0; }
 
 .select-type { display: flex; background: var(--bg-secondary); border-radius: var(--radius); padding: 4px; border: 1px solid var(--border); }
-.select-type button { flex: 1; padding: 10px 16px; border: none; background: transparent; color: var(--text-secondary); font-weight: 600; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+.select-type button { flex: 1; padding: 8px 12px; border: none; background: transparent; color: var(--text-secondary); font-weight: 600; border-radius: 6px; cursor: pointer; font-size: 0.82rem; }
 .select-type button.active { background: var(--accent); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-.input-field { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-primary); color: var(--text-primary); font-size: 1rem; }
+.input-field { flex: 1; padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; }
 
-.categories { padding: 0 16px; display: grid; gap: 16px; }
+.categories { padding: 0 12px; display: grid; gap: 10px; }
+
+.layout-zone {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+}
+
+.main-column {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
 
 .category-card {
     background: var(--surface);
@@ -106,44 +326,99 @@ body {
 }
 
 .category-header {
-    width: 100%; padding: 20px; border: none;
+    width: 100%; padding: 12px 14px; border: none;
     background: linear-gradient(135deg, var(--cat-color, var(--accent)) 0%, rgba(0,0,0,0.2) 100%);
     color: white; text-align: left; cursor: pointer;
     display: flex; justify-content: space-between; align-items: center;
-    font-size: 1.2rem; font-weight: 700; text-transform: uppercase;
+    font-size: 1rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.05em;
-    position: relative; min-height: 80px;
+    position: relative; min-height: 62px;
 }
 
 .category-header::before {
-    content: var(--cat-emoji, '🍽️'); font-size: 2.5rem; position: absolute;
-    right: 20px; top: 50%; transform: translateY(-50%); opacity: 0.3;
+    content: ''; position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 85% 50%, rgba(255,255,255,0.2) 0%, transparent 35%);
+    pointer-events: none;
 }
 
 .category-header::after { content: '▼'; font-size: 0.8rem; transition: transform 0.2s; }
 .category-card.active .category-header::after { transform: rotate(180deg); }
 
+.category-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+.category-thumb {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 5px;
+    object-fit: contain;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.category-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 210px;
+}
+
 .category-count {
     background: rgba(255,255,255,0.2); padding: 4px 12px;
     border-radius: 20px; font-size: 0.875rem; margin-right: 40px;
+    position: relative;
+    z-index: 1;
 }
 
-.category-body { display: none; padding: 16px; background: var(--bg-secondary); }
+.category-body { display: none; padding: 10px; background: var(--bg-secondary); }
 .category-card.active .category-body { display: block; }
 
 .product {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+    border-radius: var(--radius); padding: 14px; margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
 }
 
-.product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.product-info h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
-.product-price { font-size: 1.2rem; font-weight: 700; color: var(--accent); font-family: 'Courier New', monospace; }
+.product::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 42px;
+    height: 42px;
+    background-image: var(--cat-img);
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.16;
+    filter: saturate(1.1);
+    pointer-events: none;
+    z-index: 0;
+}
 
-.quantity-control { display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); border-radius: var(--radius); padding: 4px; width: fit-content; }
-.qty-btn { width: 44px; height: 44px; border: none; background: var(--surface); color: var(--accent); font-size: 1.5rem; font-weight: 700; border-radius: 8px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.product > * {
+    position: relative;
+    z-index: 1;
+}
+
+.product-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+.product-info h3 { font-size: 1.06rem; font-weight: 700; margin-bottom: 2px; }
+.product-price { font-size: 1.08rem; font-weight: 700; color: var(--accent); font-family: 'Courier New', monospace; }
+
+.quantity-control { display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); border-radius: var(--radius); padding: 3px; width: fit-content; }
+.qty-btn { width: 42px; height: 42px; border: none; background: var(--surface); color: var(--accent); font-size: 1.35rem; font-weight: 700; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 .qty-btn.add { background: var(--accent); color: white; }
-.qty-display { min-width: 30px; text-align: center; font-weight: 700; font-size: 1.1rem; }
+.qty-display { min-width: 28px; text-align: center; font-weight: 700; font-size: 1.05rem; }
 
 .extras-box, .rellenos-box {
     margin-top: 12px; padding: 12px;
@@ -173,9 +448,9 @@ body {
 }
 
 .chip {
-    padding: 10px 16px; border: 2px solid var(--border);
+    padding: 6px 10px; border: 1px solid var(--border);
     border-radius: 24px; background: var(--surface);
-    font-size: 0.95rem; cursor: pointer; user-select: none;
+    font-size: 0.82rem; cursor: pointer; user-select: none;
     transition: all 0.2s; font-weight: 500;
 }
 
@@ -201,13 +476,13 @@ body {
 .footer-total {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--surface); border-top: 1px solid var(--border);
-    padding: 16px; display: flex; gap: 12px; align-items: center;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 12px; align-items: center;
     box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.1); z-index: 100;
 }
 .total-box { flex: 1; }
 .total-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
-.total-amount { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); font-family: 'Courier New', monospace; }
-.btn-confirm { padding: 14px 24px; background: var(--success); color: white; border: none; border-radius: var(--radius); font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.total-amount { font-size: 1.35rem; font-weight: 700; color: var(--text-primary); font-family: 'Courier New', monospace; }
+.btn-confirm { padding: 12px 18px; background: var(--success); color: white; border: none; border-radius: var(--radius); font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
@@ -228,21 +503,21 @@ body {
 .btn-modal-primary { flex: 1; padding: 14px; background: var(--accent); color: white; border: none; border-radius: var(--radius); font-weight: 700; cursor: pointer; }
 .btn-modal-secondary { flex: 1; padding: 14px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius); font-weight: 600; cursor: pointer; }
 
-.category-card[data-cat="Quesadilla"] { --cat-color: #f59e0b; --cat-emoji: '🧀'; }
-.category-card[data-cat="Gordita"] { --cat-color: #8b5cf6; --cat-emoji: '🥙'; }
-.category-card[data-cat="Sopes"] { --cat-color: #10b981; --cat-emoji: '🥣'; }
-.category-card[data-cat="Pambazo"] { --cat-color: #ef4444; --cat-emoji: '🥪'; }
-.category-card[data-cat="Tostada"] { --cat-color: #ec4899; --cat-emoji: '🌮'; }
-.category-card[data-cat="Caldos"] { --cat-color: #3b82f6; --cat-emoji: '🍲'; }
-.category-card[data-cat="Tacos"] { --cat-color: #f97316; --cat-emoji: '🌮'; }
-.category-card[data-cat="Bebidas"] { --cat-color: #06b6d4; --cat-emoji: '🥤'; }
-.category-card[data-cat="Postres"] { --cat-color: #d946ef; --cat-emoji: '🍰'; }
+.category-card[data-cat="Quesadilla"] { --cat-color: #b91c1c; --cat-img: url('{{ url_for("static", filename="img/categorias/quesadilla.svg") }}'); }
+.category-card[data-cat="Gordita"] { --cat-color: #c62828; --cat-img: url('{{ url_for("static", filename="img/categorias/gordita.svg") }}'); }
+.category-card[data-cat="Sopes"] { --cat-color: #ad1d1d; --cat-img: url('{{ url_for("static", filename="img/categorias/sopes.svg") }}'); }
+.category-card[data-cat="Pambazo"] { --cat-color: #dc2626; --cat-img: url('{{ url_for("static", filename="img/categorias/pambazo.svg") }}'); }
+.category-card[data-cat="Tostada"] { --cat-color: #9f1239; --cat-img: url('{{ url_for("static", filename="img/categorias/tostada.svg") }}'); }
+.category-card[data-cat="Caldos"] { --cat-color: #991b1b; --cat-img: url('{{ url_for("static", filename="img/categorias/caldos.svg") }}'); }
+.category-card[data-cat="Tacos"] { --cat-color: #d97706; --cat-img: url('{{ url_for("static", filename="img/categorias/tacos.svg") }}'); }
+.category-card[data-cat="Bebidas"] { --cat-color: #be123c; --cat-img: url('{{ url_for("static", filename="img/categorias/bebidas.svg") }}'); }
+.category-card[data-cat="Postres"] { --cat-color: #a21caf; --cat-img: url('{{ url_for("static", filename="img/categorias/postres.svg") }}'); }
 
 .microphone-btn {
-    position: fixed; bottom: 100px; right: 20px;
-    width: 60px; height: 60px; border-radius: 50%;
+    position: fixed; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); right: 20px;
+    width: 52px; height: 52px; border-radius: 50%;
     background: var(--danger); color: white; border: none;
-    font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    font-size: 1.25rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     z-index: 99; display: flex; align-items: center; justify-content: center;
     transition: all 0.3s;
 }
@@ -313,10 +588,35 @@ body {
 .voice-hint.show { display: block; }
 .voice-hint strong { display: block; margin-bottom: 4px; }
 
+.voice-hint .mic-permission-btn {
+    margin-top: 8px;
+    border: 1px solid var(--accent);
+    background: var(--surface);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.voice-hint .mic-permission-btn.ok {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+}
+
+.mic-status {
+    margin-top: 8px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+}
+
 /* Nuevos estilos para comandos de voz mejorados */
 .voice-commands-help {
     position: fixed;
-    bottom: 170px;
+    bottom: calc(170px + env(safe-area-inset-bottom, 0px));
     right: 20px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -333,6 +633,130 @@ body {
 .voice-commands-help ul { list-style: none; padding: 0; }
 .voice-commands-help li { margin-bottom: 4px; color: var(--text-secondary); }
 .voice-commands-help li::before { content: '🎤 '; }
+
+.quick-cart {
+    display: none;
+    position: sticky;
+    top: 130px;
+    align-self: start;
+    margin-right: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.quick-cart-head {
+    padding: 12px 14px;
+    background: linear-gradient(135deg, var(--accent), #4338ca);
+    color: white;
+    font-weight: 700;
+    font-family: 'Baloo 2', 'Manrope', sans-serif;
+    letter-spacing: 0.02em;
+}
+
+.quick-cart-body {
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+    padding: 10px;
+}
+
+body.one-hand-mode .search-bar,
+body.one-hand-mode .quick-toolbar {
+    position: static;
+}
+
+body.one-hand-mode .order-info {
+    margin: 8px 10px;
+    padding: 10px;
+}
+
+body.one-hand-mode .category-header {
+    min-height: 54px;
+    padding: 10px 12px;
+    font-size: 0.92rem;
+}
+
+body.one-hand-mode .product {
+    padding: 8px;
+}
+
+body.one-hand-mode .qty-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+}
+
+body.one-hand-mode .chip,
+body.one-hand-mode .sabor-chip,
+body.one-hand-mode .guisado-item {
+    font-size: 0.78rem;
+}
+
+body.one-hand-mode .footer-total {
+    padding: 8px 10px;
+}
+
+body.one-hand-mode .microphone-btn {
+    width: 46px;
+    height: 46px;
+    bottom: 82px;
+}
+
+.quick-cart-empty {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 24px 12px;
+}
+
+.quick-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px dashed var(--border);
+    padding: 10px 4px;
+}
+
+.quick-line strong { font-size: 0.9rem; display: block; }
+.quick-line span { font-size: 0.82rem; color: var(--text-secondary); display: block; }
+
+.quick-line-actions {
+    display: inline-flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.line-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 2px 7px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.line-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.line-btn.remove {
+    color: #b91c1c;
+}
+
+body.expert-mode .voice-hint,
+body.expert-mode .voice-commands-help {
+    display: none !important;
+}
+
+body.expert-mode .quick-toolbar .quick-btn {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
 
 /* Estilos para sabores de Jarritos */
 .sabores-box {
@@ -404,11 +828,59 @@ body {
     font-weight: 700;
     color: #92400e;
     margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: block;
     padding-bottom: 8px;
     border-bottom: 1px dashed #f59e0b;
+}
+
+.guisados-toggle {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    padding: 0;
+}
+
+.guisados-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.guisados-toggle-row::after {
+    content: '▾';
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.guisados-box.collapsed .guisados-toggle-row::after {
+    transform: rotate(-90deg);
+}
+
+.guisados-preview {
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: #7c2d12;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid #fcd34d;
+    border-radius: 999px;
+    padding: 4px 9px;
+    display: inline-flex;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.guisados-content {
+    display: block;
+}
+
+.guisados-box.collapsed .guisados-content {
+    display: none;
 }
 
 .guisados-grid {
@@ -502,26 +974,457 @@ body {
 .debug-info.show {
     display: block;
 }
+
+@media (min-width: 1024px) {
+    .layout-zone {
+        grid-template-columns: minmax(0, 1fr) 360px;
+        align-items: start;
+    }
+
+    .quick-cart { display: block; }
+    .categories { padding-right: 0; }
+    .quick-toolbar { grid-template-columns: 1fr auto; align-items: center; }
+
+    .main-column {
+        gap: 14px;
+    }
+
+    .order-info {
+        margin: 8px 12px;
+        padding: 14px;
+    }
+
+    .category-header {
+        min-height: 74px;
+        font-size: 1.08rem;
+    }
+
+    .search-input {
+        font-size: 1.06rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .categories {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .category-card.active {
+        grid-column: span 2;
+    }
+
+    .category-card.active .category-body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .category-card.active .category-body .product {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .header { padding: 10px 12px; }
+    .header h1 { font-size: 1rem; }
+    .quick-toolbar { padding: 8px 10px 4px; }
+    .search-bar { top: 56px; padding: 8px 10px; }
+    .order-info { margin: 8px 10px; padding: 10px; }
+    .categories { padding: 0 10px; gap: 10px; }
+    .category-header { min-height: 66px; font-size: 1rem; }
+    .product { padding: 12px; }
+    .product-info h3 { font-size: 1rem; }
+    .qty-btn { width: 44px; height: 44px; }
+    .footer-total { padding: 10px; }
+
+    .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+    .kpi-card:last-child { grid-column: auto; }
+
+    body {
+        padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .quick-actions { padding-bottom: 0; }
+    .quick-btn { padding: 7px 10px; }
+}
+
+@media (max-width: 980px) {
+    .layout-zone {
+        display: block;
+    }
+
+    .quick-cart {
+        display: none !important;
+    }
+
+    .quick-toolbar {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        overflow: visible;
+    }
+
+    .header-actions {
+        gap: 6px;
+    }
+
+    .btn-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .quick-btn {
+        width: 100%;
+        text-align: center;
+        padding: 9px 10px;
+        font-size: 0.82rem;
+    }
+
+    .kpi-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .kpi-card {
+        padding: 8px 7px;
+    }
+
+    .kpi-label {
+        font-size: 0.62rem;
+    }
+
+    .kpi-value {
+        font-size: 0.88rem;
+    }
+
+    .search-bar {
+        position: static;
+        top: auto;
+    }
+
+    .category-nav {
+        display: flex;
+        position: static;
+        z-index: auto;
+    }
+
+    .order-info {
+        margin: 8px 10px;
+    }
+
+    .order-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .select-type {
+        width: 100%;
+    }
+
+    #mesaSelect {
+        width: 100%;
+        flex: 1 !important;
+    }
+
+    .categories {
+        padding: 0 10px;
+    }
+
+    .category-header {
+        min-height: 64px;
+        padding: 11px 12px;
+        font-size: 0.98rem;
+    }
+
+    .guisados-box {
+        padding: 10px;
+        scroll-margin-top: 12px;
+    }
+
+    .guisados-title {
+        font-size: 0.82rem;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+    }
+
+    .guisados-preview {
+        font-size: 0.72rem;
+        padding: 3px 8px;
+    }
+
+    .guisados-content {
+        max-height: 220px;
+        overflow: auto;
+        padding-right: 2px;
+    }
+
+    .guisados-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .guisado-item {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border-width: 1px;
+        min-height: 38px;
+    }
+
+    .guisado-item:hover {
+        transform: none;
+    }
+
+    .guisado-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+    }
+
+    .guisado-item label {
+        font-size: 0.95rem;
+        line-height: 1.2;
+    }
+
+    .guisados-count {
+        margin-top: 8px;
+        padding: 6px;
+        font-size: 0.78rem;
+    }
+
+    body.one-hand-mode {
+        padding-bottom: calc(230px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.one-hand-mode .header {
+        position: static;
+    }
+
+    body.one-hand-mode .search-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+        z-index: 96;
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -6px 16px rgba(0,0,0,0.18);
+        background: var(--surface);
+    }
+
+    body.one-hand-mode .category-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: calc(126px + env(safe-area-inset-bottom, 0px));
+        z-index: 95;
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.12);
+        background: var(--surface);
+    }
+
+    body.one-hand-mode .layout-zone {
+        margin-bottom: 140px;
+    }
+
+    body.one-hand-mode .microphone-btn {
+        bottom: calc(178px + env(safe-area-inset-bottom, 0px));
+        right: 14px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .speed-strip,
+    .ops-status {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
+
+@media (max-width: 980px) and (orientation: landscape) {
+    .search-bar {
+        position: sticky;
+        top: 56px;
+        z-index: 88;
+        margin-left: 126px;
+        width: calc(100% - 126px);
+    }
+
+    .category-nav {
+        display: flex;
+        position: fixed;
+        left: 8px;
+        top: 106px;
+        bottom: 86px;
+        width: 110px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 4px;
+        border-bottom: none;
+        z-index: 87;
+    }
+
+    .category-nav-btn {
+        width: 100%;
+        text-align: left;
+        font-size: 0.74rem;
+        padding: 7px 8px;
+    }
+
+    .layout-zone {
+        display: block;
+        margin-left: 126px;
+    }
+
+    .categories {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .category-card.active {
+        grid-column: span 2;
+    }
+
+    .category-card.active .category-body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .category-card.active .category-body .product {
+        margin-bottom: 0;
+    }
+
+    .order-row {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .microphone-btn {
+        right: 14px;
+        bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+@media (min-width: 981px) and (max-width: 1279px) {
+    .layout-zone {
+        grid-template-columns: minmax(0, 1fr) 300px;
+    }
+
+    .quick-cart {
+        display: block;
+    }
+
+    .categories {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .quick-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .category-card.active {
+        grid-column: span 2;
+    }
+
+    .category-card.active .category-body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+}
 </style>
 </head>
 
 <body>
 
 <header class="header">
-    <h1>🧾 Nueva Venta</h1>
-    <button class="btn-icon" onclick="toggleTheme()" id="theme-icon">🌙</button>
+    <div class="header-left">
+        <a href="/" class="btn-back" title="Volver al inicio">← Inicio</a>
+        <h1>🧾 Nueva Venta</h1>
+    </div>
+    <div class="header-actions">
+        <button class="btn-icon" onclick="toggleFullscreen()" id="fullscreenBtn" title="Pantalla completa">⛶</button>
+        <button class="btn-icon" onclick="toggleOneHandMode()" id="oneHandBtn" title="Modo una mano">🤚</button>
+        <button class="btn-icon" onclick="toggleVoice()" title="Comando de voz">🎤</button>
+        <button class="btn-icon" onclick="toggleTheme()" id="theme-icon">🌙</button>
+    </div>
 </header>
 
+<section class="quick-toolbar" aria-label="Acciones rapidas">
+    <div class="quick-actions">
+        <button type="button" class="quick-btn" onclick="toggleCategoriasGlobal(true)">Expandir todo</button>
+        <button type="button" class="quick-btn" onclick="toggleCategoriasGlobal(false)">Contraer todo</button>
+        <button type="button" class="quick-btn" onclick="deshacerUltimaEliminacion()">Deshacer</button>
+        <button type="button" class="quick-btn" onclick="limpiarPedido()">Limpiar pedido</button>
+    </div>
+    <div class="kpi-strip">
+        <div class="kpi-card">
+            <div class="kpi-label">Articulos</div>
+            <div class="kpi-value" id="kpiItems">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Categorias</div>
+            <div class="kpi-value" id="kpiCategorias">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Ticket</div>
+            <div class="kpi-value" id="kpiTicket">$0.00</div>
+        </div>
+    </div>
+</section>
+
+<div class="ops-status" id="opsStatus">
+    <span id="opsStatusText">Modo rapido listo</span>
+    <span class="ops-pill ok" id="opsPill">Online</span>
+</div>
+
+<section class="speed-strip" aria-label="Atajos de venta">
+    <div class="speed-title">Atajos</div>
+    <div class="speed-chips">
+        <button type="button" class="speed-chip combo" onclick="irCategoria('Quesadilla')">Quesadilla</button>
+        <button type="button" class="speed-chip combo" onclick="irCategoria('Gordita')">Gordita</button>
+        <button type="button" class="speed-chip" onclick="irCategoria('Tacos')">Tacos</button>
+        <button type="button" class="speed-chip" onclick="irCategoria('Bebidas')">Bebidas</button>
+    </div>
+</section>
+
 <div class="voice-hint" id="voiceHint">
-    <strong>🎤 Di un platillo a la vez:</strong>
-    "Una quesadilla de champiñones al comal con todo"
+    <strong>Comando de voz disponible</strong>
+    <span>Ejemplo: "dos quesadillas de pollo con crema".</span>
+    <button type="button" class="mic-permission-btn" id="micPermissionBtn" onclick="solicitarPermisoMicrofono()">Activar microfono</button>
+    <div class="mic-status" id="micStatus"></div>
 </div>
 
 <div class="search-bar">
     <input type="text" id="buscador" class="search-input" placeholder="🔍 Buscar producto..." oninput="filtrarProductos()">
 </div>
 
+<div class="category-nav" id="categoryNav" aria-label="Navegacion por categorias">
+    {% for categoria, items in productos|groupby("categoria") %}
+    <button type="button" class="category-nav-btn" data-cat-chip="{{categoria}}" onclick="irCategoria('{{categoria}}')">{{categoria}}</button>
+    {% endfor %}
+</div>
+
 <form method="post" id="formPedido">
+
+<div class="layout-zone">
+
+<div class="main-column">
 
 <div class="order-info">
     <div class="order-row">
@@ -551,14 +1454,40 @@ body {
 'Tostada':['Lechuga','Crema','Queso','C/Todo','Sin frijoles']
 } %}
 
-{% set adicionales=['Pollo','Res','Picadillo','Chicharrón','Huitlacoche','Flor de calabaza','Champiñones','Papa c/longaniza','Quesillo'] %}
+{% set guisados_por_categoria={
+    'Gordita':['Pollo','Res','Picadillo','Chicharrón','Huitlacoche','Flor de calabaza','Champiñones','Quesillo'],
+    'Pambazo':['Pollo','Res','Picadillo','Huitlacoche','Flor de calabaza','Champiñones','Papa c/longaniza','Quesillo'],
+    'Sopes':['Pollo','Res','Picadillo','Huitlacoche','Flor de calabaza','Champiñones','Quesillo'],
+    'Quesadilla':['Pollo','Res','Picadillo','Chicharrón','Huitlacoche','Flor de calabaza','Champiñones','Queso','Quesillo']
+} %}
 
 {% set sabores_jarritos=['Uva','Tamarindo','Limón','Piña','Tutifruti','Toronja','Mandarina','Manzana'] %}
+
+{% set categoria_imagen={
+    'Quesadilla':url_for('static', filename='img/categorias/quesadilla.svg'),
+    'Gordita':url_for('static', filename='img/categorias/gordita.svg'),
+    'Sopes':url_for('static', filename='img/categorias/sopes.svg'),
+    'Pambazo':url_for('static', filename='img/categorias/pambazo.svg'),
+    'Tostada':url_for('static', filename='img/categorias/tostada.svg'),
+    'Caldos':url_for('static', filename='img/categorias/caldos.svg'),
+    'Tacos':url_for('static', filename='img/categorias/tacos.svg'),
+    'Bebidas':url_for('static', filename='img/categorias/bebidas.svg'),
+    'Postres':url_for('static', filename='img/categorias/postres.svg')
+} %}
 
 {% for categoria,items in productos|groupby("categoria") %}
 <div class="category-card" data-cat="{{categoria}}">
     <button type="button" class="category-header" onclick="toggleCategoria(this)">
-        <span>{{categoria}}</span>
+        <span class="category-title-wrap">
+            <img
+                class="category-thumb"
+                src="{{ categoria_imagen.get(categoria, url_for('static', filename='img/categorias/tostada.svg')) }}"
+                alt="Categoria {{categoria}}"
+                loading="lazy"
+                decoding="async"
+            >
+            <span class="category-name">{{categoria}}</span>
+        </span>
         <span class="category-count" id="count_{{categoria}}" style="display:none;">0</span>
     </button>
     
@@ -591,18 +1520,24 @@ body {
             </div>
             {% endif %}
 
-            {% if 'Adicional' in p.nombre and categoria in ['Gordita','Pambazo','Sopes','Quesadilla'] %}
+            {% set nombre_lower = p.nombre|lower %}
+            {% if categoria in guisados_por_categoria and ('adicional' in nombre_lower or 'guisado' in nombre_lower or 'quesillo' in nombre_lower) %}
             <div class="guisados-box" id="guisados_{{p.id}}">
-                <div class="guisados-title">🍖 Selecciona máximo 3 guisados</div>
-                <div class="guisados-grid" id="grid_guisados_{{p.id}}">
-                    {% for a in adicionales %}
-                    <div class="guisado-item" onclick="toggleGuisado(this, '{{p.id}}')">
-                        <input type="checkbox" value="{{a}}" data-guisado="true" id="guisado_{{p.id}}_{{loop.index}}">
-                        <label for="guisado_{{p.id}}_{{loop.index}}">{{a}}</label>
+                <button type="button" class="guisados-title guisados-toggle" onclick="toggleGuisadosPanel('{{p.id}}')">
+                    <span class="guisados-toggle-row">🍖 Selecciona máximo 3 guisados</span>
+                    <span class="guisados-preview" id="preview_guisados_{{p.id}}">Sin seleccionar</span>
+                </button>
+                <div class="guisados-content" id="content_guisados_{{p.id}}">
+                    <div class="guisados-grid" id="grid_guisados_{{p.id}}">
+                        {% for a in guisados_por_categoria[categoria] %}
+                        <div class="guisado-item" onclick="toggleGuisado(this, '{{p.id}}')">
+                            <input type="checkbox" value="{{a}}" data-guisado="true" id="guisado_{{p.id}}_{{loop.index}}">
+                            <label for="guisado_{{p.id}}_{{loop.index}}">{{a}}</label>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+                    <div class="guisados-count" id="count_guisados_{{p.id}}">0/3 seleccionados</div>
                 </div>
-                <div class="guisados-count" id="count_guisados_{{p.id}}">0/3 seleccionados</div>
             </div>
             {% endif %}
 
@@ -625,6 +1560,17 @@ body {
     </div>
 </div>
 {% endfor %}
+
+</div>
+
+<aside class="quick-cart" aria-label="Resumen rapido de pedido">
+    <div class="quick-cart-head">Resumen rapido</div>
+    <div class="quick-cart-body" id="quickCartList">
+        <div class="quick-cart-empty">Aun no hay productos en la orden.</div>
+    </div>
+</aside>
+
+</div>
 
 </div>
 
@@ -655,7 +1601,7 @@ body {
     </ul>
 </div>
 
-<div class="debug-info" id="debugInfo"></div>
+<div class="debug-info" id="debugInfo" style="display:none !important;"></div>
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
@@ -686,12 +1632,34 @@ body {
 <script>
 let carrito = {};
 const MAX_GUisados = 3;
+const VOICE_DEBUG = false;
 let recognition = null;
 let isListening = false;
 let voicePermissionStatus = 'prompt';
 let isProcessingVoice = false; // Flag para evitar procesamiento múltiple
+let micPermissionGranted = false;
+
+function tieneContextoSeguroMicrofono() {
+    if (window.isSecureContext) return true;
+    const host = window.location.hostname;
+    return host === 'localhost' || host === '127.0.0.1';
+}
+
+function setMicStatus(message) {
+    const status = document.getElementById('micStatus');
+    if (status) status.textContent = message || '';
+}
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+function isCompactViewport() {
+    const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    if (window.innerWidth <= 760) return true;
+    if (window.innerWidth <= 980 && !isLandscape) return true;
+    if (window.innerWidth <= 900 && coarsePointer) return true;
+    return false;
+}
 
 const VOICE_CONFIG = {
     lang: 'es-MX',
@@ -700,6 +1668,36 @@ const VOICE_CONFIG = {
     maxAlternatives: 1
 };
 
+let filtroTimer = null;
+let lastTouchedProductId = null;
+let lastRemovedSnapshot = null;
+
+function updateOpsStatus() {
+    const pill = document.getElementById('opsPill');
+    const text = document.getElementById('opsStatusText');
+    if (!pill || !text) return;
+
+    if (!navigator.onLine) {
+        pill.textContent = 'Offline';
+        pill.className = 'ops-pill off';
+        text.textContent = 'Sin conexion. Captura y envia al recuperar red.';
+        return;
+    }
+
+    const oneHand = document.body.classList.contains('one-hand-mode');
+    pill.textContent = oneHand ? 'Una mano' : 'Online';
+    pill.className = oneHand ? 'ops-pill warn' : 'ops-pill ok';
+    text.textContent = isCompactViewport() ? 'Vista movil optimizada activa' : 'Modo rapido listo';
+}
+
+function updateKpis(totalItems, total, catCounts) {
+    const itemsEl = document.getElementById('kpiItems');
+    const categoriesEl = document.getElementById('kpiCategorias');
+    const ticketEl = document.getElementById('kpiTicket');
+    if (itemsEl) itemsEl.textContent = String(totalItems);
+    if (categoriesEl) categoriesEl.textContent = String(Object.keys(catCounts).length);
+    if (ticketEl) ticketEl.textContent = `$${total.toFixed(2)}`;
+}
 // ============================================================================
 // MAPA DE PRODUCTOS EXACTOS - Basado en tu menú real
 // ============================================================================
@@ -777,13 +1775,32 @@ const BEBIDAS_MAP = {
     'squirt': 'squirt',
     'sprite': 'squirt',
     'del valle': 'del valle mango',
+    'del valle mango': 'del valle mango',
+    'mango': 'del valle mango',
+    'del valle durazno': 'del valle durazno',
+    'durazno': 'del valle durazno',
     'delvalle': 'del valle mango',
+    'del val': 'del valle mango',
     'horchata': 'agua de horchata',
+    'agua horchata': 'agua de horchata',
+    'horchata medio': 'agua de horchata 1/2',
+    'horchata litro': 'agua de horchata 1l',
     'agua de horchata': 'agua de horchata',
     'cafe': 'café de olla',
     'café': 'café de olla',
+    'cafe de olla': 'café de olla',
     'atole': 'atole de guayaba',
+    'atole guayaba': 'atole de guayaba',
+    'litro de pozole': 'litro de pozole',
+    'litros de pozole': 'litro de pozole',
+    'litro pozole': 'litro de pozole',
+    'litros pozole': 'litro de pozole',
+    'pozole litro': 'litro de pozole',
+    'pozole litros': 'litro de pozole',
+    'pozole 1l': 'litro de pozole',
+    'pozole un litro': 'litro de pozole',
     'pozole': 'pozole',
+    'pozoles': 'pozole',
     'descorche': 'descorche'
 };
 
@@ -856,17 +1873,60 @@ function initVoice() {
         document.getElementById('micBtn').classList.remove('listening');
         
         if (event.error === 'not-allowed') {
+            setMicStatus('Chrome bloqueo el microfono para este sitio.');
             mostrarToast('🔒 Permite el micrófono');
         } else if (event.error === 'no-speech') {
             mostrarToast('⚠️ No detecté voz');
+        } else if (event.error === 'service-not-allowed') {
+            setMicStatus('Servicio de voz no permitido en este contexto.');
         }
     };
+}
+
+async function solicitarPermisoMicrofono() {
+    const btn = document.getElementById('micPermissionBtn');
+
+    if (!tieneContextoSeguroMicrofono()) {
+        micPermissionGranted = false;
+        if (btn) {
+            btn.textContent = 'Microfono bloqueado por HTTP';
+            btn.classList.remove('ok');
+        }
+        setMicStatus('En Chrome movil el microfono requiere HTTPS o localhost. Con IP local (http) puede bloquearse sin prompt.');
+        mostrarToast('Microfono bloqueado por contexto no seguro');
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        micPermissionGranted = true;
+        stream.getTracks().forEach(track => track.stop());
+        if (btn) {
+            btn.textContent = 'Microfono activo';
+            btn.classList.add('ok');
+        }
+        setMicStatus('Permiso concedido. Ya puedes usar comandos de voz.');
+        mostrarToast('Microfono habilitado');
+    } catch (error) {
+        micPermissionGranted = false;
+        if (btn) {
+            btn.textContent = 'Permiso bloqueado - tocar para reintentar';
+            btn.classList.remove('ok');
+        }
+        setMicStatus('Revisa permisos: candado del sitio -> Permisos -> Microfono -> Permitir.');
+        mostrarToast('No pude activar el microfono. Revisa permisos de sitio en Chrome.');
+    }
 }
 
 function toggleVoice() {
     if (!recognition) {
         initVoice();
         if (!recognition) return;
+    }
+
+    if (!micPermissionGranted && navigator.mediaDevices && isMobile) {
+        solicitarPermisoMicrofono();
+        return;
     }
 
     if (isListening) {
@@ -890,23 +1950,38 @@ function procesarComandoVoz(textoOriginal) {
     const cantidad = extraerCantidad(texto);
     mostrarDebug('Cantidad: ' + cantidad);
     
-    // 2. Detectar tipo de pedido
-    if (texto.includes('para llevar')) {
+    // 2. Detectar tipo de pedido/contexto
+    let contextoActualizado = false;
+
+    if (texto.includes('para llevar') || texto.includes('a llevar') || texto.includes('llevar') || texto.includes('pa llevar')) {
         setTipo('LLEVAR');
+        contextoActualizado = true;
     } else if (texto.match(/mesa\s*\d+/)) {
         const match = texto.match(/mesa\s*(\d+)/);
         if (match) {
             document.getElementById('mesaSelect').value = match[1];
             setTipo('MESA');
+            contextoActualizado = true;
+        }
+    } else {
+        const mesaByWord = extraerMesaPorTexto(texto);
+        if (mesaByWord) {
+            document.getElementById('mesaSelect').value = String(mesaByWord);
+            setTipo('MESA');
+            contextoActualizado = true;
         }
     }
     
     // 3. Buscar PRODUCTO ÚNICO - Estrategia de prioridad
     
-    let productoEncontrado = null;
+    let productoEncontrado = buscarPozoleDirecto(texto);
     let extrasDetectados = [];
     let guisadosDetectados = [];
     let saborDetectado = null;
+
+    if (productoEncontrado) {
+        mostrarDebug('Pozole directo: ' + productoEncontrado.nombre);
+    }
     
     // ESTRATEGIA 1: Buscar coincidencia exacta de frase completa primero
     const productos = document.querySelectorAll('.product');
@@ -921,7 +1996,7 @@ function procesarComandoVoz(textoOriginal) {
     
     mostrarDebug('Palabras clave: ' + palabrasClave.join(', '));
     
-    productos.forEach(prod => {
+    if (!productoEncontrado) productos.forEach(prod => {
         const nombreProd = normalizarTexto(prod.querySelector('h3').textContent);
         const categoriaProd = prod.dataset.categoria;
         
@@ -964,7 +2039,7 @@ function procesarComandoVoz(textoOriginal) {
     });
     
     // Solo aceptar si tiene suficiente puntuación
-    if (mejorProducto && mejorPuntuacion >= 5) {
+    if (!productoEncontrado && mejorProducto && mejorPuntuacion >= 5) {
         productoEncontrado = mejorProducto;
         mostrarDebug('Producto: ' + mejorProducto.nombre + ' (score: ' + mejorPuntuacion + ')');
     }
@@ -973,8 +2048,22 @@ function procesarComandoVoz(textoOriginal) {
     if (!productoEncontrado) {
         productoEncontrado = buscarPorCategoriaYGuisado(texto);
     }
+
+    // Búsqueda especializada para bebidas frecuentes del menú
+    if (!productoEncontrado) {
+        productoEncontrado = buscarBebidaPorComando(texto);
+    }
     
     if (!productoEncontrado) {
+        // Si el comando solo cambió mesa/tipo, no mostrar error de producto.
+        if (contextoActualizado) {
+            const tipo = document.getElementById('tipoPedido').value;
+            const mesa = document.getElementById('mesaSelect').value;
+            const msgContexto = tipo === 'LLEVAR' ? '✅ Pedido para llevar' : `✅ Mesa ${mesa} seleccionada`;
+            mostrarToast(msgContexto);
+            return;
+        }
+
         mostrarToast(`❌ No encontré "${textoOriginal}"`);
         return;
     }
@@ -1013,6 +2102,134 @@ function procesarComandoVoz(textoOriginal) {
     
     mostrarToast(msg);
     if (navigator.vibrate) navigator.vibrate(50);
+}
+
+function buscarPozoleDirecto(texto) {
+    const textoNorm = normalizarTexto(texto || '');
+    if (!/\bpozole(s)?\b/.test(textoNorm)) return null;
+
+    const pideLitro = /\b(litro|litros|1l|lt|lts)\b/.test(textoNorm);
+    const productos = document.querySelectorAll('.product');
+
+    for (const prod of productos) {
+        const nombre = normalizarTexto(prod.querySelector('h3').textContent);
+        const categoria = normalizarTexto(prod.dataset.categoria || '');
+        if (!categoria.includes('caldo') || !nombre.includes('pozole')) continue;
+
+        const esLitro = /\b(litro|1l|lt|lts)\b/.test(nombre);
+        if (pideLitro && esLitro) {
+            return {
+                elemento: prod,
+                id: prod.id.replace('product_', ''),
+                nombre: prod.querySelector('h3').textContent,
+                categoria: prod.dataset.categoria,
+                puntuacion: 15
+            };
+        }
+        if (!pideLitro && !esLitro) {
+            return {
+                elemento: prod,
+                id: prod.id.replace('product_', ''),
+                nombre: prod.querySelector('h3').textContent,
+                categoria: prod.dataset.categoria,
+                puntuacion: 15
+            };
+        }
+    }
+
+    return null;
+}
+
+function buscarBebidaPorComando(texto) {
+    const textoNorm = normalizarTexto(texto || '');
+    let termino = null;
+    const claves = Object.keys(BEBIDAS_MAP).sort((a, b) => b.length - a.length);
+    for (let clave of claves) {
+        if (textoNorm.includes(clave)) {
+            termino = BEBIDAS_MAP[clave];
+            break;
+        }
+    }
+
+    if (!termino) return null;
+
+    const quierePozole = /\bpozole(s)?\b/.test(textoNorm);
+    const quiereLitroPozole = quierePozole && /\b(litro|litros|1l|lt|lts)\b/.test(textoNorm);
+
+    const productos = document.querySelectorAll('.product');
+
+    // Regla dedicada para diferenciar plato vs litro de pozole.
+    if (quierePozole) {
+        let seleccionado = null;
+        for (let prod of productos) {
+            const nombre = normalizarTexto(prod.querySelector('h3').textContent);
+            const categoria = normalizarTexto(prod.dataset.categoria || '');
+            if (!categoria.includes('caldo') || !nombre.includes('pozole')) continue;
+
+            const esLitro = nombre.includes('litro');
+            if (quiereLitroPozole && esLitro) { seleccionado = prod; break; }
+            if (!quiereLitroPozole && !esLitro) { seleccionado = prod; break; }
+        }
+
+        if (seleccionado) {
+            return {
+                elemento: seleccionado,
+                id: seleccionado.id.replace('product_', ''),
+                nombre: seleccionado.querySelector('h3').textContent,
+                categoria: seleccionado.dataset.categoria,
+                puntuacion: 14
+            };
+        }
+    }
+
+    let mejor = null;
+    let mejorPuntaje = -1;
+    for (let prod of productos) {
+        const nombre = normalizarTexto(prod.querySelector('h3').textContent);
+        const categoria = normalizarTexto(prod.dataset.categoria || '');
+        const terminoNorm = normalizarTexto(termino);
+        const esMatchNombre = nombre.includes(terminoNorm);
+        const esCategoriaValida = categoria.includes('bebida') || categoria.includes('caldo');
+
+        if (esMatchNombre && esCategoriaValida) {
+            let puntaje = categoria.includes('caldo') ? 12 : 10;
+            if (nombre === terminoNorm) puntaje += 5;
+            else if (nombre.startsWith(terminoNorm)) puntaje += 3;
+
+            if (puntaje > mejorPuntaje) {
+                mejorPuntaje = puntaje;
+                mejor = {
+                    elemento: prod,
+                    id: prod.id.replace('product_', ''),
+                    nombre: prod.querySelector('h3').textContent,
+                    categoria: prod.dataset.categoria,
+                    puntuacion: puntaje
+                };
+            }
+        }
+    }
+
+    return mejor;
+}
+
+function extraerMesaPorTexto(texto) {
+    const mapaMesas = {
+        'mesa uno': 1,
+        'mesa 1': 1,
+        'mesa dos': 2,
+        'mesa 2': 2,
+        'mesa tres': 3,
+        'mesa 3': 3,
+        'mesa cuatro': 4,
+        'mesa 4': 4,
+        'mesa cinco': 5,
+        'mesa 5': 5
+    };
+
+    for (let clave in mapaMesas) {
+        if (texto.includes(clave)) return mapaMesas[clave];
+    }
+    return null;
 }
 
 // ============================================================================
@@ -1057,17 +2274,10 @@ function buscarPorCategoriaYGuisado(texto) {
     
     if (!categoria) return null;
     
-    // Detectar guisado específico
-    const estructura = MENU_STRUCTURE[categoria];
-    if (!estructura || !estructura.guisados) return null;
-    
-    let guisadoEncontrado = null;
-    for (let clave in estructura.guisados) {
-        if (texto.includes(clave)) {
-            guisadoEncontrado = estructura.guisados[clave];
-            break;
-        }
-    }
+    // Si el comando menciona rellenos/guisados, priorizar producto configurable
+    const guisadosDetectados = detectarGuisados(texto, categoria).length;
+    const mencionaConfigurable = guisadosDetectados > 0 ||
+        texto.includes('quesillo') || texto.includes('guisado') || texto.includes('con ');
     
     // Buscar producto que coincida
     const productos = document.querySelectorAll('.product');
@@ -1076,39 +2286,34 @@ function buscarPorCategoriaYGuisado(texto) {
         const catProd = prod.dataset.categoria.toLowerCase();
         
         if (catProd === categoria || categoria.includes(catProd)) {
-            // Si encontró guisado específico, verificar que coincida
-            if (guisadoEncontrado) {
-                const guisadoNormalizado = normalizarTexto(guisadoEncontrado);
-                if (nombre.includes(guisadoNormalizado) || 
-                    (categoria === 'quesadilla' && nombre.includes(guisadoNormalizado.replace(' de ', ' ')))) {
+            if (mencionaConfigurable && (nombre.includes('guisado') || nombre.includes('quesillo') || nombre.includes('adicional'))) {
+                return {
+                    elemento: prod,
+                    id: prod.id.replace('product_', ''),
+                    nombre: prod.querySelector('h3').textContent,
+                    categoria: prod.dataset.categoria,
+                    puntuacion: 12
+                };
+            }
+
+            // Sin relleno explícito, buscar variante base por categoría
+            if (categoria === 'quesadilla') {
+                if (texto.includes('quesillo') && nombre.includes('quesillo')) {
                     return {
                         elemento: prod,
                         id: prod.id.replace('product_', ''),
                         nombre: prod.querySelector('h3').textContent,
                         categoria: prod.dataset.categoria,
-                        puntuacion: 10
+                        puntuacion: 8
                     };
-                }
-            } else {
-                // Sin guisado específico, buscar el base
-                if (categoria === 'quesadilla') {
-                    if (texto.includes('quesillo') && nombre.includes('quesillo')) {
-                        return {
-                            elemento: prod,
-                            id: prod.id.replace('product_', ''),
-                            nombre: prod.querySelector('h3').textContent,
-                            categoria: prod.dataset.categoria,
-                            puntuacion: 8
-                        };
-                    } else if (!texto.includes('quesillo') && nombre.includes('normal')) {
-                        return {
-                            elemento: prod,
-                            id: prod.id.replace('product_', ''),
-                            nombre: prod.querySelector('h3').textContent,
-                            categoria: prod.dataset.categoria,
-                            puntuacion: 8
-                        };
-                    }
+                } else if (!texto.includes('quesillo') && nombre.includes('normal')) {
+                    return {
+                        elemento: prod,
+                        id: prod.id.replace('product_', ''),
+                        nombre: prod.querySelector('h3').textContent,
+                        categoria: prod.dataset.categoria,
+                        puntuacion: 8
+                    };
                 }
             }
         }
@@ -1161,6 +2366,10 @@ function detectarGuisados(texto, categoria) {
     // Mapa específico por categoría
     const mapasGuisados = {
         'quesadilla': {
+            'tinga de pollo': 'Pollo',
+            'tinga pollo': 'Pollo',
+            'tinga de res': 'Res',
+            'tinga res': 'Res',
             'champiñones': 'Champiñones',
             'champinones': 'Champiñones',
             'hongos': 'Champiñones',
@@ -1184,6 +2393,27 @@ function detectarGuisados(texto, categoria) {
             'quesillo': 'Quesillo'
         },
         'gordita': {
+            'tinga de pollo': 'Pollo',
+            'tinga pollo': 'Pollo',
+            'tinga de res': 'Res',
+            'tinga res': 'Res',
+            'pollo': 'Pollo',
+            'res': 'Res',
+            'picadillo': 'Picadillo',
+            'chicharron': 'Chicharrón',
+            'chicharrón': 'Chicharrón',
+            'huitlacoche': 'Huitlacoche',
+            'flor de calabaza': 'Flor de Calabaza',
+            'calabaza': 'Flor de Calabaza',
+            'champiñones': 'Champiñones',
+            'champinones': 'Champiñones',
+            'quesillo': 'Quesillo'
+        },
+        'pambazo': {
+            'tinga de pollo': 'Pollo',
+            'tinga pollo': 'Pollo',
+            'tinga de res': 'Res',
+            'tinga res': 'Res',
             'pollo': 'Pollo',
             'res': 'Res',
             'picadillo': 'Picadillo',
@@ -1193,10 +2423,25 @@ function detectarGuisados(texto, categoria) {
             'champiñones': 'Champiñones',
             'champinones': 'Champiñones',
             'papa con longaniza': 'Papa c/longaniza',
+            'papa longaniza': 'Papa c/longaniza',
             'papa': 'Papa c/longaniza',
             'quesillo': 'Quesillo'
+        },
+        'sope': {
+            'tinga de pollo': 'Pollo',
+            'tinga pollo': 'Pollo',
+            'tinga de res': 'Res',
+            'tinga res': 'Res',
+            'pollo': 'Pollo',
+            'res': 'Res',
+            'picadillo': 'Picadillo',
+            'huitlacoche': 'Huitlacoche',
+            'flor de calabaza': 'Flor de Calabaza',
+            'calabaza': 'Flor de Calabaza',
+            'champiñones': 'Champiñones',
+            'champinones': 'Champiñones',
+            'quesillo': 'Quesillo'
         }
-        // ... otras categorías
     };
     
     const mapa = mapasGuisados[catLower] || {};
@@ -1370,11 +2615,28 @@ function toggleGuisado(item, productoId) {
 function actualizarContadorGuisados(productoId) {
     const grid = document.getElementById(`grid_guisados_${productoId}`);
     const countEl = document.getElementById(`count_guisados_${productoId}`);
+    const previewEl = document.getElementById(`preview_guisados_${productoId}`);
     if (!grid || !countEl) return;
     
     const seleccionados = grid.querySelectorAll('input[type="checkbox"]:checked').length;
+    const etiquetas = Array.from(grid.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
     countEl.textContent = `${seleccionados}/3 seleccionados`;
     countEl.classList.toggle('max', seleccionados >= 3);
+
+    if (previewEl) {
+        if (!etiquetas.length) {
+            previewEl.textContent = 'Sin seleccionar';
+        } else if (etiquetas.length <= 2) {
+            previewEl.textContent = etiquetas.join(' + ');
+        } else {
+            previewEl.textContent = `${etiquetas[0]} + ${etiquetas[1]} +${etiquetas.length - 2}`;
+        }
+    }
+
+    const box = document.getElementById(`guisados_${productoId}`);
+    if (box && window.innerWidth <= 980 && seleccionados > 0) {
+        box.classList.remove('collapsed');
+    }
 }
 
 function actualizarObservacionesGuisados(productoId) {
@@ -1413,6 +2675,7 @@ function mostrarToast(mensaje) {
 }
 
 function mostrarDebug(mensaje) {
+    if (!VOICE_DEBUG) return;
     console.log(mensaje);
     const debug = document.getElementById('debugInfo');
     if (debug) {
@@ -1429,13 +2692,216 @@ function mostrarDebug(mensaje) {
 // FUNCIONES EXISTENTES (Preservadas)
 // ============================================================================
 
+function initOneHandMode() {
+    const saved = localStorage.getItem('oneHandMode') === '1';
+    const shouldApply = saved && isCompactViewport();
+    if (shouldApply) {
+        document.body.classList.add('one-hand-mode');
+    } else {
+        document.body.classList.remove('one-hand-mode');
+    }
+    updateOneHandButton();
+}
+
+function toggleOneHandMode() {
+    document.body.classList.toggle('one-hand-mode');
+    localStorage.setItem('oneHandMode', document.body.classList.contains('one-hand-mode') ? '1' : '0');
+    updateOneHandButton();
+    updateOpsStatus();
+}
+
+function updateOneHandButton() {
+    const btn = document.getElementById('oneHandBtn');
+    if (!btn) return;
+    btn.classList.toggle('active', document.body.classList.contains('one-hand-mode'));
+}
+
+function isFullscreenActive() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+function fullscreenSupported() {
+    return !!(
+        document.documentElement.requestFullscreen ||
+        document.documentElement.webkitRequestFullscreen ||
+        document.fullscreenEnabled ||
+        document.webkitFullscreenEnabled
+    );
+}
+
+function syncFullscreenButton() {
+    const btn = document.getElementById('fullscreenBtn');
+    if (!btn) return;
+    if (!fullscreenSupported()) {
+        btn.style.display = 'none';
+        return;
+    }
+    btn.style.display = 'flex';
+    btn.classList.toggle('active', isFullscreenActive());
+    btn.textContent = isFullscreenActive() ? '✕' : '⛶';
+    btn.title = isFullscreenActive() ? 'Salir de pantalla completa' : 'Pantalla completa';
+}
+
+async function toggleFullscreen() {
+    if (!fullscreenSupported()) {
+        mostrarToast('Este navegador no permite pantalla completa en esta vista.');
+        return;
+    }
+
+    try {
+        if (isFullscreenActive()) {
+            if (document.exitFullscreen) await document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        } else {
+            const el = document.documentElement;
+            if (el.requestFullscreen) await el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        }
+    } catch (_) {
+        mostrarToast('No pude activar pantalla completa. Intentalo con otro toque.');
+    }
+
+    syncFullscreenButton();
+}
+
+function setActiveCategoryChip(catName) {
+    document.querySelectorAll('.category-nav-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.catChip === catName);
+    });
+}
+
+function irCategoria(categoria) {
+    const card = document.querySelector(`.category-card[data-cat="${categoria}"]`);
+    if (!card) return;
+    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    setActiveCategoryChip(categoria);
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 90);
+}
+
+function toggleGuisadosPanel(productoId, forceExpand) {
+    const box = document.getElementById(`guisados_${productoId}`);
+    if (!box) return;
+    if (typeof forceExpand === 'boolean') {
+        box.classList.toggle('collapsed', !forceExpand);
+        return;
+    }
+    box.classList.toggle('collapsed');
+}
+
+function initGuisadosPanels() {
+    const isCompact = isCompactViewport();
+    document.querySelectorAll('.guisados-box').forEach((box) => {
+        const selected = box.querySelectorAll('input[type="checkbox"]:checked').length;
+        if (isCompact && selected === 0) box.classList.add('collapsed');
+        else box.classList.remove('collapsed');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initOneHandMode();
     initTheme();
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         initVoice();
     } else {
         document.getElementById('micBtn').style.display = 'none';
     }
+
+    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+    setActiveCategoryChip('');
+
+    initGuisadosPanels();
+    window.addEventListener('resize', initGuisadosPanels);
+    window.addEventListener('resize', updateOpsStatus);
+    window.addEventListener('online', updateOpsStatus);
+    window.addEventListener('offline', updateOpsStatus);
+    syncFullscreenButton();
+    document.addEventListener('fullscreenchange', syncFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
+
+    const hint = document.getElementById('voiceHint');
+    if (hint && isMobile) {
+        hint.classList.add('show');
+        if (!tieneContextoSeguroMicrofono()) {
+            setMicStatus('Estás en http por IP local. Para activar voz en Chrome movil usa HTTPS o localhost.');
+        }
+    }
+
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'microphone' }).then(result => {
+            voicePermissionStatus = result.state;
+            micPermissionGranted = result.state === 'granted';
+            const btn = document.getElementById('micPermissionBtn');
+            if (btn && micPermissionGranted) {
+                btn.textContent = 'Microfono activo';
+                btn.classList.add('ok');
+            }
+            if (result.state === 'denied') {
+                setMicStatus('Permiso denegado. Habilitalo en configuración del sitio.');
+            }
+        }).catch(() => {});
+    }
+
+    document.addEventListener('keydown', (event) => {
+        const targetTag = (event.target && event.target.tagName) ? event.target.tagName.toLowerCase() : '';
+        const isTyping = ['input', 'textarea', 'select'].includes(targetTag);
+
+        if (event.ctrlKey && event.key.toLowerCase() === 'k') {
+            event.preventDefault();
+            document.getElementById('buscador').focus();
+            return;
+        }
+
+        if (event.key === '/' && !isTyping) {
+            event.preventDefault();
+            document.getElementById('buscador').focus();
+            return;
+        }
+
+        if (event.key === 'Escape') {
+            if (document.getElementById('modal').classList.contains('active')) {
+                cerrarModal();
+            }
+            const buscador = document.getElementById('buscador');
+            if (buscador && buscador.value) {
+                buscador.value = '';
+                filtrarProductosNow();
+            }
+            return;
+        }
+
+        if (isTyping) return;
+
+        if (event.key >= '1' && event.key <= '9') {
+            const index = Number(event.key) - 1;
+            const cards = Array.from(document.querySelectorAll('.category-card')).filter(c => c.style.display !== 'none');
+            const target = cards[index];
+            if (target) {
+                const btn = target.querySelector('.category-header');
+                if (btn) btn.click();
+            }
+            return;
+        }
+
+        if ((event.key === '+' || event.key === '=') && lastTouchedProductId) {
+            quickSumar(lastTouchedProductId);
+            return;
+        }
+
+        if ((event.key === '-' || event.key === '_') && lastTouchedProductId) {
+            quickRestar(lastTouchedProductId);
+            return;
+        }
+
+        if (event.key === 'Enter' && !document.getElementById('modal').classList.contains('active')) {
+            event.preventDefault();
+            confirmarPedido();
+            return;
+        }
+    });
+
+    render();
+    updateOpsStatus();
 });
 
 function initTheme() {
@@ -1443,6 +2909,8 @@ function initTheme() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (saved) document.documentElement.setAttribute('data-theme', saved);
     else if (prefersDark) document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.setAttribute('data-theme', 'light');
+    updateThemeColor();
     updateThemeIcon();
 }
 
@@ -1451,7 +2919,15 @@ function toggleTheme() {
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
+    updateThemeColor();
     updateThemeIcon();
+}
+
+function updateThemeColor() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return;
+    meta.setAttribute('content', isDark ? '#0b0b0d' : '#c91f2a');
 }
 
 function updateThemeIcon() {
@@ -1473,15 +2949,18 @@ function toggleCategoria(btn) {
     document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
     if (!wasActive) {
         card.classList.add('active');
+        setActiveCategoryChip(card.dataset.cat || '');
         setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    } else {
+        setActiveCategoryChip('');
     }
 }
 
-function filtrarProductos() {
-    const texto = document.getElementById("buscador").value.toLowerCase();
-    document.querySelectorAll(".category-card").forEach(cat => {
+function filtrarProductosNow() {
+    const texto = document.getElementById('buscador').value.toLowerCase();
+    document.querySelectorAll('.category-card').forEach(cat => {
         let visible = false;
-        cat.querySelectorAll(".product").forEach(prod => {
+        cat.querySelectorAll('.product').forEach(prod => {
             const match = prod.dataset.nombre.includes(texto) || prod.dataset.categoria.includes(texto);
             prod.style.display = match ? 'block' : 'none';
             if (match) visible = true;
@@ -1489,6 +2968,60 @@ function filtrarProductos() {
         cat.style.display = visible ? 'block' : 'none';
         if (visible && texto.length > 0) cat.classList.add('active');
     });
+}
+
+function filtrarProductos() {
+    if (filtroTimer) clearTimeout(filtroTimer);
+    filtroTimer = setTimeout(filtrarProductosNow, 180);
+}
+
+function toggleCategoriasGlobal(expandir) {
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.classList.toggle('active', !!expandir);
+    });
+}
+
+function limpiarPedido() {
+    if (!Object.keys(carrito).length) return;
+    if (!confirm('Se borrara el pedido actual. Deseas continuar?')) return;
+
+    carrito = {};
+    document.querySelectorAll('[id^="prod_"]').forEach(el => el.value = '');
+    document.querySelectorAll('[id^="obs_"]').forEach(el => el.value = '');
+    render();
+    mostrarToast('Pedido limpio');
+}
+
+function eliminarProductoCompleto(id) {
+    if (!carrito[id]) return;
+    lastRemovedSnapshot = {
+        id,
+        item: JSON.parse(JSON.stringify(carrito[id]))
+    };
+    delete carrito[id];
+    render();
+    mostrarToast('Producto eliminado. Puedes deshacer.');
+}
+
+function deshacerUltimaEliminacion() {
+    if (!lastRemovedSnapshot) {
+        mostrarToast('No hay cambios para deshacer');
+        return;
+    }
+    carrito[lastRemovedSnapshot.id] = lastRemovedSnapshot.item;
+    lastTouchedProductId = lastRemovedSnapshot.id;
+    lastRemovedSnapshot = null;
+    render();
+    mostrarToast('Eliminacion revertida');
+}
+
+function quickSumar(id) {
+    const btn = document.querySelector(`#product_${id} .qty-btn.add`);
+    if (btn) btn.click();
+}
+
+function quickRestar(id) {
+    cambiarCantidad(id, -1);
 }
 
 function toggleExtra(chip, event) {
@@ -1549,11 +3082,13 @@ function agregarProducto(id, nombre, precio, categoria) {
     }
     
     carrito[id].piezas.push({ obs: observaciones.join(' | ') });
+    lastTouchedProductId = id;
     render();
 }
 
 function cambiarCantidad(id, delta) {
     if (!carrito[id]) return;
+    lastTouchedProductId = id;
     if (delta < 0) {
         carrito[id].piezas.pop();
         if (carrito[id].piezas.length === 0) delete carrito[id];
@@ -1606,7 +3141,36 @@ function render() {
     
     document.getElementById('totalDisplay').textContent = `$${total.toFixed(2)}`;
     document.getElementById('btnConfirmar').disabled = totalItems === 0;
-    
+
+    const quickCartList = document.getElementById('quickCartList');
+    if (quickCartList) {
+        if (!totalItems) {
+            quickCartList.innerHTML = '<div class="quick-cart-empty">Aun no hay productos en la orden.</div>';
+        } else {
+            let quickHtml = '';
+            for (let id in carrito) {
+                const p = carrito[id];
+                const qty = p.piezas.length;
+                const subtotal = qty * p.precio;
+                quickHtml += `
+                    <div class="quick-line">
+                        <div>
+                            <strong>${p.nombre}</strong>
+                            <span>${qty} x $${p.precio.toFixed(2)}</span>
+                            <div class="quick-line-actions">
+                                <button type="button" class="line-btn" onclick="quickSumar('${id}')">+</button>
+                                <button type="button" class="line-btn" onclick="quickRestar('${id}')">-</button>
+                                <button type="button" class="line-btn remove" onclick="eliminarProductoCompleto('${id}')">Quitar</button>
+                            </div>
+                        </div>
+                        <strong>$${subtotal.toFixed(2)}</strong>
+                    </div>
+                `;
+            }
+            quickCartList.innerHTML = quickHtml;
+        }
+    }
+
     const countSpan = document.getElementById('countItems');
     if (totalItems > 0) {
         countSpan.textContent = `(${totalItems})`;
@@ -1614,9 +3178,49 @@ function render() {
     } else {
         countSpan.style.display = 'none';
     }
+
+    updateKpis(totalItems, total, catCounts);
+    updateOpsStatus();
+}
+
+function validarPedidoAntesDeConfirmar() {
+    const tipo = document.getElementById('tipoPedido').value;
+    const mesa = document.getElementById('mesaSelect').value;
+
+    if (tipo === 'MESA' && !mesa) {
+        mostrarToast('Selecciona una mesa antes de confirmar');
+        return false;
+    }
+
+    for (let id in carrito) {
+        const p = carrito[id];
+        const name = normalizarTexto(p.nombre);
+        const requiereGuisados =
+            name.includes('adicional') ||
+            name.includes('guisado') ||
+            name.includes('quesillo o') ||
+            (name.includes('c/quesillo') &&
+                (name.includes('gordita') || name.includes('pambazo') || name.includes('sope') || name.includes('quesadilla')));
+
+        for (const pieza of p.piezas) {
+            const obs = normalizarTexto(pieza.obs || '');
+            if (name.includes('jarrito') && !obs.includes('sabor')) {
+                mostrarToast(`Falta sabor en ${p.nombre}`);
+                return false;
+            }
+            if (requiereGuisados && !obs.includes('guisados')) {
+                mostrarToast(`Faltan guisados en ${p.nombre}`);
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 function confirmarPedido() {
+    if (!validarPedidoAntesDeConfirmar()) return;
+
     const tipo = document.getElementById('tipoPedido').value;
     const mesa = document.getElementById('mesaSelect').value;
     const alias = document.querySelector('input[name="alias"]').value;

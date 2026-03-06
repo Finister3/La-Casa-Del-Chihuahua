@@ -696,7 +696,7 @@ body {
             </div>
             
             <div class="user-actions">
-                <button class="btn-action edit" onclick='openEditModal({{ user.id|tojson }}, {{ user.usuario|tojson }}, {{ user.rol|tojson }})' title="Editar">
+                <button class="btn-action edit" onclick='openEditModal({{ user.id|tojson }}, {{ user.usuario|tojson }}, {{ user.rol|tojson }}, {{ user.permisos_extra_list|tojson }})' title="Editar">
                     ✏️
                 </button>
                 
@@ -760,6 +760,19 @@ body {
                 </div>
                 
                 <div class="perm-grid" id="permisos-preview" style="display: none; margin-top: 16px;"></div>
+
+                <div class="form-group" style="margin-top:16px;">
+                    <label class="form-label">Privilegios Extra (opcionales)</label>
+                    <div class="perm-grid" style="display:grid; gap:8px; grid-template-columns:1fr 1fr;">
+                        {% for key, label in privilegios_catalogo.items() %}
+                        <label style="display:flex;align-items:center;gap:8px;font-size:0.875rem;">
+                            <input type="checkbox" name="permisos_extra" value="{{ key }}">
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="help-text">Los privilegios extra se suman al rol base.</div>
+                </div>
             </div>
             
             <div class="modal-footer">
@@ -801,6 +814,19 @@ body {
                         <option value="cocina">👨‍🍳 Cocina</option>
                         <option value="mesero">🍽️ Mesero</option>
                     </select>
+                </div>
+
+                <div class="form-group" style="margin-top:16px;">
+                    <label class="form-label">Privilegios Extra</label>
+                    <div class="perm-grid" style="display:grid; gap:8px; grid-template-columns:1fr 1fr;">
+                        {% for key, label in privilegios_catalogo.items() %}
+                        <label style="display:flex;align-items:center;gap:8px;font-size:0.875rem;">
+                            <input type="checkbox" class="edit-perm-check" name="permisos_extra" value="{{ key }}" data-perm="{{ key }}">
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="help-text">Úsalos para promociones internas sin cambiar rol.</div>
                 </div>
                 
                 <div class="alert alert-error" style="margin-top: 16px; font-size: 0.875rem;">
@@ -848,19 +874,19 @@ body {
 const PERMISOS = {
     admin: {
         desc: "Control total del sistema: usuarios, finanzas, configuración",
-        perms: ["✅ Todas las funciones", "✅ Gestión de usuarios", "✅ Reportes completos", "✅ Configuración del sistema"]
+        perms: ["✅ Todas las funciones", "✅ Gestión de usuarios", "✅ Reportes completos", "✅ Configuración del sistema", "✅ Modificar platillos en cocina"]
     },
     cajero: {
         desc: "Manejo de ventas, cortes de caja y comandas",
-        perms: ["✅ Punto de venta", "✅ Corte de caja", "✅ Historial de ventas", "❌ Gestión de usuarios", "❌ Apartados avanzados"]
+        perms: ["✅ Punto de venta", "✅ Corte de caja", "✅ Historial de ventas", "✅ Modificar platillos en cocina", "❌ Gestión de usuarios", "❌ Apartados avanzados"]
     },
     cocina: {
-        desc: "Solo acceso a la pantalla de cocina para preparar órdenes",
-        perms: ["✅ Pantalla de cocina", "✅ Marcar órdenes listas", "❌ Ventas", "❌ Precios", "❌ Corte"]
+        desc: "Acceso a la pantalla de cocina para preparar y ajustar órdenes",
+        perms: ["✅ Pantalla de cocina", "✅ Marcar órdenes listas", "✅ Modificar platillos en cocina", "❌ Ventas", "❌ Precios", "❌ Corte"]
     },
     mesero: {
         desc: "Toma de órdenes y ventas rápidas",
-        perms: ["✅ Tomar comandas", "✅ Venta rápida", "✅ Ver mesas", "❌ Corte de caja", "❌ Modificar precios"]
+        perms: ["✅ Tomar comandas", "✅ Venta rápida", "✅ Ver mesas", "✅ Modificar platillos en cocina", "❌ Corte de caja", "❌ Modificar precios"]
     }
 };
 
@@ -938,11 +964,17 @@ function closeModal(type) {
     document.body.style.overflow = '';
 }
 
-function openEditModal(id, usuario, rol) {
+function openEditModal(id, usuario, rol, permisosExtra) {
     document.getElementById('edit-user-id').value = id;
     document.getElementById('edit-usuario').value = usuario;
     document.getElementById('edit-usuario-display').value = usuario;
     document.getElementById('edit-rol').value = rol;
+
+    const permisos = Array.isArray(permisosExtra) ? permisosExtra : [];
+    document.querySelectorAll('.edit-perm-check').forEach(chk => {
+        chk.checked = permisos.includes(chk.dataset.perm);
+    });
+
     openModal('edit');
 }
 

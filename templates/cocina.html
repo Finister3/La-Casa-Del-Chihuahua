@@ -4,454 +4,157 @@
 <meta charset="utf-8">
 <title>Cocina - La Casa Del Chihuahua</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 :root{
-    --indigo-500:#6366f1;
-    --indigo-100:#e0e7ff;
-    --emerald-500:#10b981;
-    --emerald-100:#d1fae5;
-    --red-500:#ef4444;
-    --red-100:#fee2e2;
-    --amber-500:#f59e0b;
-    --amber-100:#fef3c7;
-    --slate-50:#f8fafc;
-    --slate-100:#f1f5f9;
-    --slate-200:#e2e8f0;
-    --slate-400:#94a3b8;
-    --slate-600:#475569;
-    --slate-800:#1e293b;
-    --white:#ffffff;
-    --shadow:0 4px 6px -1px rgba(0,0,0,0.1);
-    --shadow-lg:0 20px 25px -5px rgba(0,0,0,0.1);
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --surface: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --accent: #4f46e5;
+    --accent-hover: #4338ca;
+    --accent-light: #e0e7ff;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --radius: 8px;
+    --radius-lg: 16px;
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+[data-theme="dark"] {
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --surface: #0f172a;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border: #1e293b;
+    --accent: #6366f1;
+    --accent-light: #1e1b4b;
 }
 
-body{
-    background:var(--slate-50);
-    color:var(--slate-800);
-    padding-bottom:100px;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:var(--bg-primary);color:var(--text-primary);padding-bottom:92px;line-height:1.45}
 
-/* Header */
-.header{
-    background:linear-gradient(135deg,var(--red-500),#dc2626);
-    color:white;
-    padding:20px;
-    position:sticky;
-    top:0;
-    z-index:100;
-    box-shadow:var(--shadow);
-}
+.topbar{position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
+.topbar-row{max-width:1500px;margin:0 auto;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-hover));color:#fff}
+.brand h1{font-size:1.02rem;line-height:1.1}
+.brand p{font-size:.73rem;color:var(--text-tertiary)}
+.top-actions{display:flex;gap:8px}
+.icon-btn{border:1px solid var(--border);border-radius:10px;padding:9px 11px;background:var(--surface);color:var(--text-secondary);font-weight:700;cursor:pointer}
+.icon-btn:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.icon-btn.listening{background:var(--success);color:#fff;border-color:var(--success);animation:pulse 1.2s infinite}
+.sound-control{border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:var(--surface);color:var(--text-secondary);font-weight:700;font-size:.78rem}
+.admin-only{outline:1px dashed var(--accent);outline-offset:1px}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
 
-.header h1{
-    font-size:24px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+.container{max-width:1500px;margin:0 auto;padding:12px}
 
-.header p{
-    opacity:0.9;
-    font-size:14px;
-    margin-top:4px;
-}
+.status-strip{display:flex;gap:6px;align-items:center;padding:0;flex-wrap:wrap}
+.status-chip{display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid var(--border);font-size:.72rem;font-weight:700;background:var(--surface);line-height:1}
+.status-dot{width:8px;height:8px;border-radius:50%}
+.status-chip b{font-size:.8rem}
+.status-chip.pending{background:var(--danger-light);border-color:#fecaca;color:#991b1b}
+.status-chip.pending .status-dot{background:var(--danger)}
+.status-chip.preparing{background:var(--warning-light);border-color:#fde68a;color:#92400e}
+.status-chip.preparing .status-dot{background:var(--warning)}
+.status-chip.ready{background:var(--success-light);border-color:#a7f3d0;color:#065f46}
+.status-chip.ready .status-dot{background:var(--success)}
 
-/* Stats Bar */
-.stats-bar{
-    display:flex;
-    gap:12px;
-    padding:16px;
-    overflow-x:auto;
-    background:var(--white);
-    margin:16px;
-    border-radius:16px;
-    box-shadow:var(--shadow);
-}
-
-.stat-item{
-    flex:1;
-    min-width:100px;
-    text-align:center;
-    padding:12px;
-    border-radius:12px;
-}
-
-.stat-number{
-    font-size:24px;
-    font-weight:800;
-    color:var(--indigo-500);
-}
-
-.stat-label{
-    font-size:11px;
-    color:var(--slate-400);
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-    margin-top:2px;
-}
-
-/* Grupos de Mesas */
-details.grupo{
-    margin:0 16px 16px;
-    background:var(--white);
-    border-radius:20px;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-}
-
-summary{
-    padding:20px;
-    font-size:18px;
-    font-weight:700;
-    color:var(--slate-800);
-    cursor:pointer;
-    list-style:none;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    background:var(--white);
-    border-bottom:1px solid transparent;
-    transition:all 0.2s;
-}
-
+.board{display:grid;grid-template-columns:1fr;gap:10px;padding:10px 0 0}
+details.group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+summary{list-style:none;cursor:pointer;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:700;background:var(--bg-secondary);font-size:.88rem}
 summary::-webkit-details-marker{display:none}
+.badge{padding:3px 8px;border-radius:999px;background:var(--accent);color:#fff;font-size:.72rem}
+.group-grid{display:grid;grid-template-columns:1fr;gap:8px;padding:8px}
 
-summary::after{
-    content:"▼";
-    font-size:14px;
-    color:var(--slate-400);
-    transition:transform 0.2s;
+.comanda{margin:8px;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:9px}
+.comanda[data-estado="Pendiente"]{border-left:4px solid var(--danger);background:linear-gradient(180deg,#fff, #fff5f5)}
+.comanda[data-estado="Preparando"]{border-left:4px solid var(--warning);background:linear-gradient(180deg,#fff,#fffbeb)}
+.comanda[data-estado="Lista"]{border-left:4px solid var(--success);background:linear-gradient(180deg,#fff,#f0fdf4)}
+.comanda-head{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:5px}
+.title{font-weight:800;font-size:.95rem}
+.state{font-size:.75rem;padding:4px 8px;border-radius:999px;font-weight:700}
+.state.Pendiente{background:var(--danger-light);color:#991b1b}
+.state.Preparando{background:var(--warning-light);color:#92400e}
+.state.Lista{background:var(--success-light);color:#065f46}
+.meta{color:var(--text-secondary);font-size:.75rem;margin-bottom:6px}
+
+.cat{--cat-accent:var(--accent);--cat-soft:var(--accent-light);margin-top:7px;border-top:1px dashed var(--border);padding:7px 7px 4px;border-radius:10px;background:linear-gradient(180deg,var(--cat-soft),transparent 70%)}
+.cat h3{font-size:.7rem;text-transform:uppercase;color:var(--cat-accent);margin-bottom:5px;letter-spacing:.06em}
+
+.item{border:1px solid var(--border);border-left:4px solid var(--cat-accent);border-radius:10px;padding:7px;margin-bottom:6px;background:var(--bg-primary)}
+.item-row{display:flex;align-items:center;gap:8px}
+.item-name{font-weight:700;flex:1;font-size:.84rem;line-height:1.2}
+.item-qty{font-size:.72rem;background:var(--accent-light);color:var(--accent);padding:2px 7px;border-radius:999px}
+.item-progress{height:5px;border-radius:999px;background:var(--border);margin:6px 0;overflow:hidden}
+.item-progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--success),#34d399);width:0%;transition:width .2s}
+.deliver{font-size:.72rem;color:var(--text-secondary)}
+.item-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.mini{border:none;border-radius:8px;padding:5px 8px;font-weight:700;cursor:pointer;font-size:.72rem}
+.mini.gray{background:var(--bg-secondary);color:var(--text-secondary)}
+.mini.green{background:var(--success-light);color:#166534}
+.mini.blue{background:var(--accent-light);color:var(--accent)}
+
+.comanda-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.comanda-actions.single{grid-template-columns:1fr}
+.primary,.secondary{border:none;border-radius:10px;padding:8px;font-weight:800;cursor:pointer;font-size:.78rem}
+.primary{background:linear-gradient(135deg,var(--success),#059669);color:#fff}
+.secondary{background:linear-gradient(135deg,var(--accent),var(--accent-hover));color:#fff}
+
+.footer-actions{position:fixed;bottom:12px;left:12px;right:12px;display:flex;gap:8px;z-index:45}
+.footer-actions a,.footer-actions button{flex:1;text-align:center;text-decoration:none;border:none;border-radius:12px;padding:12px;font-weight:800;cursor:pointer}
+.back{background:var(--surface);border:1px solid var(--border);color:var(--text-primary)}
+.refresh{background:var(--accent);color:#fff}
+
+.empty{margin:20px 0;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);text-align:center;color:var(--text-secondary)}
+
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--text-primary);color:#fff;padding:8px 12px;border-radius:10px;opacity:0;transition:.2s;z-index:90;font-size:.84rem}
+.toast.show{opacity:1}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:80}
+.modal.show{display:flex}
+.sheet{background:var(--surface);width:100%;border-radius:18px 18px 0 0;padding:16px;max-height:88vh;overflow:auto;border-top:1px solid var(--border)}
+.sheet h2{font-size:1.05rem;margin-bottom:8px}
+.sheet small{color:var(--text-secondary)}
+.fgroup{margin-top:10px}
+.fgroup label{display:block;font-size:.83rem;margin-bottom:5px;color:var(--text-secondary)}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:1rem;background:var(--bg-primary);color:var(--text-primary)}
+.sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+
+@media (min-width: 768px){
+    .topbar-row{padding:12px 20px}
+    .container{padding:16px 20px}
+    .board{grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px}
+    .group-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 
-details.grupo[open] summary{
-    background:var(--indigo-50);
-    color:var(--indigo-500);
-    border-bottom-color:var(--indigo-100);
+@media (min-width: 1200px){
+    .board{grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:12px}
+    .group-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+    details.group{height:fit-content}
+    .comanda{padding:10px}
+    .modal{align-items:center;justify-content:center}
+    .sheet{max-width:620px;border-radius:16px}
+    .footer-actions{left:auto;right:18px;width:320px}
 }
 
-details.grupo[open] summary::after{
-    transform:rotate(180deg);
-}
-
-.badge-count{
-    background:var(--indigo-500);
-    color:white;
-    padding:4px 12px;
-    border-radius:20px;
-    font-size:13px;
-    font-weight:700;
-}
-
-/* Comanda Card */
-.comanda{
-    margin:16px;
-    background:var(--white);
-    border-radius:20px;
-    padding:20px;
-    box-shadow:var(--shadow);
-    border-left:5px solid var(--amber-500);
-    position:relative;
-}
-
-.comanda.urgente{
-    border-left-color:var(--red-500);
-    animation:pulse 2s infinite;
-}
-
-@keyframes pulse{
-    0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.2)}
-    50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}
-}
-
-.comanda-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
-    padding-bottom:12px;
-    border-bottom:2px solid var(--slate-100);
-}
-
-.comanda-id{
-    font-size:20px;
-    font-weight:800;
-    color:var(--slate-800);
-    display:flex;
-    align-items:center;
-    gap:8px;
-}
-
-.estado-badge{
-    background:var(--amber-100);
-    color:var(--amber-600);
-    padding:6px 14px;
-    border-radius:20px;
-    font-size:12px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-}
-
-.estado-badge.pendiente{background:var(--red-100);color:var(--red-500);}
-.estado-badge.preparando{background:var(--amber-100);color:var(--amber-600);}
-.estado-badge.lista{background:var(--emerald-100);color:var(--emerald-500);}
-
-/* Info Cliente */
-.cliente-info{
-    display:flex;
-    gap:16px;
-    margin-bottom:16px;
-    font-size:14px;
-    color:var(--slate-600);
-}
-
-.cliente-info span{
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-
-/* Observaciones Generales */
-.obs-general{
-    background:var(--amber-50);
-    border:2px solid var(--amber-200);
-    border-radius:12px;
-    padding:12px;
-    margin-bottom:16px;
-    font-size:14px;
-    color:var(--slate-700);
-    display:flex;
-    gap:8px;
-    align-items:flex-start;
-}
-
-.obs-general::before{
-    content:"📝";
-    font-size:16px;
-}
-
-/* Categorías */
-.categoria{
-    margin-top:16px;
-    padding-top:16px;
-    border-top:2px dashed var(--slate-200);
-}
-
-.categoria h3{
-    font-size:13px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-    color:var(--indigo-500);
-    margin-bottom:12px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-}
-
-/* Productos */
-.producto{
-    background:var(--slate-50);
-    border-radius:14px;
-    padding:16px;
-    margin-bottom:10px;
-    border:2px solid transparent;
-    transition:all 0.2s;
-}
-
-.producto:hover{
-    border-color:var(--indigo-200);
-    transform:translateX(4px);
-}
-
-.producto-header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:10px;
-}
-
-.producto-check{
-    width:24px;
-    height:24px;
-    border:3px solid var(--slate-300);
-    border-radius:6px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:all 0.2s;
-    flex-shrink:0;
-}
-
-.producto-check.checked{
-    background:var(--emerald-500);
-    border-color:var(--emerald-500);
-}
-
-.producto-check.checked::after{
-    content:"✓";
-    color:white;
-    font-weight:700;
-    font-size:14px;
-}
-
-.producto-nombre{
-    flex:1;
-    font-weight:700;
-    font-size:16px;
-    color:var(--slate-800);
-}
-
-.producto-cantidad{
-    background:var(--indigo-500);
-    color:white;
-    padding:4px 12px;
-    border-radius:20px;
-    font-size:13px;
-    font-weight:700;
-}
-
-/* Barra de Progreso */
-.progress-container{
-    height:6px;
-    background:var(--slate-200);
-    border-radius:3px;
-    overflow:hidden;
-    margin:10px 0;
-}
-
-.progress-bar{
-    height:100%;
-    background:linear-gradient(90deg,var(--emerald-500),var(--emerald-400));
-    border-radius:3px;
-    transition:width 0.3s ease;
-}
-
-/* Observaciones Item */
-.obs-list{
-    margin-top:10px;
-    padding-left:36px;
-}
-
-.obs-item{
-    background:var(--white);
-    padding:8px 12px;
-    border-radius:8px;
-    margin-bottom:6px;
-    font-size:13px;
-    color:var(--slate-600);
-    border-left:3px solid var(--emerald-500);
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-
-.obs-item::before{
-    content:"•";
-    color:var(--emerald-500);
-    font-weight:700;
-}
-
-/* Botón Entregar Todo */
-.btn-todo{
-    display:block;
-    width:100%;
-    margin-top:20px;
-    padding:16px;
-    background:linear-gradient(135deg,var(--emerald-500),#059669);
-    color:white;
-    text-align:center;
-    text-decoration:none;
-    border-radius:14px;
-    font-weight:700;
-    font-size:16px;
-    box-shadow:0 4px 12px rgba(16,185,129,0.3);
-    border:none;
-    cursor:pointer;
-    transition:transform 0.1s;
-}
-
-.btn-todo:active{
-    transform:scale(0.98);
-}
-
-/* Refresh Button */
-.btn-refresh{
-    position:fixed;
-    bottom:24px;
-    right:24px;
-    width:56px;
-    height:56px;
-    background:var(--indigo-500);
-    color:white;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-decoration:none;
-    font-size:24px;
-    box-shadow:0 8px 20px rgba(99,102,241,0.4);
-    border:none;
-    cursor:pointer;
-    z-index:90;
-    transition:transform 0.2s;
-}
-
-.btn-refresh:hover{transform:rotate(180deg) scale(1.1)}
-
-/* Volver */
-.btn-volver{
-    display:block;
-    margin:20px 16px;
-    padding:14px;
-    background:var(--white);
-    color:var(--slate-600);
-    text-align:center;
-    text-decoration:none;
-    border-radius:12px;
-    font-weight:600;
-    box-shadow:var(--shadow);
-    border:2px solid var(--slate-200);
-}
-
-.empty-state{
-    text-align:center;
-    padding:60px 20px;
-    color:var(--slate-400);
-}
-
-.empty-state-icon{
-    font-size:48px;
-    margin-bottom:16px;
-    opacity:0.5;
+@media (min-width: 900px) and (max-width: 1199px){
+    .group-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
 }
 </style>
 </head>
-
 <body>
 
-<div class="header">
-    <h1>🔥 Pantalla de Cocina</h1>
-    <p>Administración de comandas en tiempo real</p>
-</div>
-
-{% set grupos = {
-    "Mesa 1": [],
-    "Mesa 2": [],
-    "Mesa 3": [],
-    "Mesa 4": [],
-    "Mesa 5": [],
-    "Para llevar": []
-} %}
-
+{% set grupos = {"Mesa 1": [],"Mesa 2": [],"Mesa 3": [],"Mesa 4": [],"Mesa 5": [],"Para llevar": []} %}
 {% for c in comandas %}
     {% if c.tipo == "LLEVAR" %}
         {% set _ = grupos["Para llevar"].append(c) %}
@@ -464,143 +167,465 @@ details.grupo[open] summary::after{
 {% set total_preparando = comandas|selectattr("estado","equalto","Preparando")|list|length %}
 {% set total_listas = comandas|selectattr("estado","equalto","Lista")|list|length %}
 
-<div class="stats-bar">
-    <div class="stat-item" style="background:var(--red-100)">
-        <div class="stat-number" style="color:var(--red-500)">{{total_pendientes}}</div>
-        <div class="stat-label">Pendientes</div>
+<header class="topbar">
+    <div class="topbar-row">
+        <div class="brand">
+            <div class="brand-icon">🔥</div>
+            <div>
+                <h1>Cocina en Vivo</h1>
+                <p>Confirmación por pieza y edición rápida</p>
+            </div>
+        </div>
+        <div class="top-actions">
+            <select id="soundLevel" class="sound-control" title="Intensidad sonido">
+                <option value="0">🔇</option>
+                <option value="0.07">🔈</option>
+                <option value="0.12">🔉</option>
+                <option value="0.18">🔊</option>
+            </select>
+            <button class="icon-btn" id="micBtn" onclick="toggleVoice()">🎤 Voz</button>
+            {% if is_admin %}
+            <button class="icon-btn admin-only" onclick="abrirAjustesAdmin()" title="Opciones admin">⚙</button>
+            {% endif %}
+        </div>
     </div>
-    <div class="stat-item" style="background:var(--amber-100)">
-        <div class="stat-number" style="color:var(--amber-500)">{{total_preparando}}</div>
-        <div class="stat-label">Preparando</div>
-    </div>
-    <div class="stat-item" style="background:var(--emerald-100)">
-        <div class="stat-number" style="color:var(--emerald-500)">{{total_listas}}</div>
-        <div class="stat-label">Listas</div>
-    </div>
-</div>
+</header>
 
-{% set hay_comandas = comandas|length > 0 %}
-{% if not hay_comandas %}
-<div class="empty-state">
-    <div class="empty-state-icon">🍽️</div>
-    <h3>Sin comandas activas</h3>
-    <p>Las nuevas comandas aparecerán aquí automáticamente</p>
-</div>
+<div class="container">
+<section class="status-strip">
+    <div class="status-chip pending"><span class="status-dot"></span>Pendientes <b>{{ total_pendientes }}</b></div>
+    <div class="status-chip preparing"><span class="status-dot"></span>Preparando <b>{{ total_preparando }}</b></div>
+    <div class="status-chip ready"><span class="status-dot"></span>Listas <b>{{ total_listas }}</b></div>
+</section>
+
+{% if not comandas %}
+<div class="empty">No hay comandas activas en este momento.</div>
 {% endif %}
 
+<main class="board">
 {% for nombre, lista in grupos.items() %}
 {% if lista|length > 0 %}
-<details class="grupo" open>
-<summary>
-    <span>{% if nombre == "Para llevar" %}📦{% else %}🪑{% endif %} {{ nombre }}</span>
-    <span class="badge-count">{{ lista|length }}</span>
-</summary>
+<details class="group" open>
+    <summary>
+        <span>{% if nombre == "Para llevar" %}📦{% else %}🪑{% endif %} {{ nombre }}</span>
+        <span class="badge">{{ lista|length }}</span>
+    </summary>
 
-{% for c in lista %}
-<div class="comanda {% if c.estado == 'Pendiente' and loop.index == 1 %}urgente{% endif %}">
+    <div class="group-grid">
+    {% for c in lista %}
+    <article class="comanda" data-comanda-id="{{ c.id }}" data-estado="{{ c.estado }}">
+        <div class="comanda-head">
+            <div class="title">#{{ c.id }} {% if c.alias %}- {{ c.alias }}{% endif %}</div>
+            <span class="state {{ c.estado }}">{{ c.estado }}</span>
+        </div>
+        <div class="meta">{{ c.tipo }} {% if c.mesa %}- Mesa {{ c.mesa }}{% endif %}</div>
 
-<div class="comanda-header">
-    <div class="comanda-id">
-        🧾 #{{ c.id }}
-        {% if c.alias %}<small style="color:var(--slate-400);font-size:14px">- {{ c.alias }}</small>{% endif %}
+        {% for categoria, items in c.detalle|groupby("categoria") %}
+        <section class="cat" data-categoria="{{ categoria }}">
+            <h3>{{ categoria }}</h3>
+            {% for d in items %}
+            {% set prog = (d.entregado_cantidad / d.cantidad * 100) if d.cantidad > 0 else 0 %}
+            <div class="item" data-detalle-id="{{ d.id }}" data-comanda-id="{{ c.id }}" data-nombre="{{ d.nombre|lower }}" data-categoria="{{ categoria }}">
+                <div class="item-row">
+                    <div class="item-name">{{ d.nombre }}</div>
+                    <div class="item-qty">x{{ d.cantidad }}</div>
+                </div>
+                <div class="item-progress"><span style="width:{{ prog }}%"></span></div>
+                <div class="deliver">Entregado: <strong class="delivered">{{ d.entregado_cantidad }}</strong> / {{ d.cantidad }}</div>
+                {% if d.observaciones %}
+                <div class="deliver" style="margin-top:4px">Obs: {{ d.observaciones.replace('||', ', ') }}</div>
+                {% endif %}
+                <div class="item-actions">
+                    <button class="mini gray" onclick="ajustarDetalle({{ d.id }}, 'restar')">-1</button>
+                    <button class="mini green" onclick="ajustarDetalle({{ d.id }}, 'sumar')">+1</button>
+                    <button class="mini blue" onclick="ajustarDetalle({{ d.id }}, 'toggle')">Todo/0</button>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        {% endfor %}
+
+        <div class="comanda-actions">
+            <button class="primary" onclick="entregarTodo({{ c.id }})">Entregar Todo</button>
+            <button class="secondary" onclick="abrirEditor({{ c.id }})">Editar / Voz</button>
+        </div>
+    </article>
+    {% endfor %}
     </div>
-    <span class="estado-badge {{ c.estado.lower() }}">{{ c.estado }}</span>
-</div>
-
-{% if c.observaciones %}
-<div class="obs-general">
-    {{ c.observaciones }}
-</div>
-{% endif %}
-
-{% for categoria, items in c.detalle|groupby("categoria") %}
-<div class="categoria">
-<h3>📂 {{ categoria }}</h3>
-
-{% for d in items %}
-{% set prog = (d.entregado_cantidad / d.cantidad * 100) if d.cantidad > 0 else 0 %}
-<div class="producto">
-
-<div class="producto-header">
-    <div class="producto-check {% if d.entregado_cantidad >= d.cantidad %}checked{% endif %}" 
-         onclick="toggleCheck(this, {{ d.id }})"></div>
-    <div class="producto-nombre">{{ d.nombre }}</div>
-    <div class="producto-cantidad">x{{ d.cantidad }}</div>
-</div>
-
-<div class="progress-container">
-    <div class="progress-bar" style="width:{{ prog }}%"></div>
-</div>
-
-{% if d.observaciones %}
-<div class="obs-list">
-{% for o in d.observaciones.split("||") %}
-{% if o.strip() %}
-<div class="obs-item">{{ o }}</div>
-{% endif %}
-{% endfor %}
-</div>
-{% endif %}
-
-</div>
-{% endfor %}
-</div>
-{% endfor %}
-
-<a href="/entregar_todo/{{ c.id }}" class="btn-todo">
-    🚀 Entregar Todo
-</a>
-
-</div>
-{% endfor %}
 </details>
 {% endif %}
 {% endfor %}
+</main>
+</div>
 
-<a href="/" class="btn-volver">⬅ Volver al Inicio</a>
-<a href="/cocina" class="btn-refresh">⟳</a>
+<div class="footer-actions">
+    <a class="back" href="/">Inicio</a>
+    <button class="refresh" onclick="location.reload()">Actualizar</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+{% if is_admin %}
+<div id="adminModal" class="modal" onclick="if(event.target===this) cerrarAjustesAdmin()">
+    <div class="sheet">
+        <h2>Opciones Visuales (Admin)</h2>
+        <small>Solo admin puede modificar estilo operativo de cocina.</small>
+        <div class="fgroup">
+            <label>Intensidad de color por categoría</label>
+            <select id="colorIntensity">
+                <option value="soft">Suave</option>
+                <option value="medium">Media</option>
+                <option value="strong">Fuerte</option>
+            </select>
+        </div>
+        <div class="sheet-actions">
+            <button class="secondary" onclick="guardarAjustesAdmin()">Guardar</button>
+            <button class="mini gray" style="padding:11px" onclick="cerrarAjustesAdmin()">Cerrar</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div id="editorModal" class="modal" onclick="if(event.target===this) cerrarEditor()">
+    <div class="sheet">
+        <h2>Editor rápido de comanda #<span id="editorComandaId">-</span></h2>
+        <small>Comandos de voz ejemplo: "agregar 2 tacos", "quitar 1 coca", "entregar todo"</small>
+
+        <div class="fgroup">
+            <label>Producto</label>
+            <select id="editorProducto"></select>
+        </div>
+        <div class="fgroup">
+            <label>Cantidad</label>
+            <input id="editorCantidad" type="number" min="1" step="1" value="1">
+        </div>
+        <div class="fgroup">
+            <label>Observaciones (opcional)</label>
+            <textarea id="editorObs" rows="2" placeholder="Sin cebolla, extra salsa, etc."></textarea>
+        </div>
+
+        <div class="sheet-actions">
+            <button class="secondary" onclick="modificarComanda('agregar')">Agregar</button>
+            <button class="primary" style="background:#7f1d1d" onclick="modificarComanda('quitar')">Quitar</button>
+        </div>
+        <div class="sheet-actions">
+            <button class="mini gray" style="padding:11px" onclick="toggleVoice()">🎤 Voz</button>
+            <button class="mini gray" style="padding:11px" onclick="cerrarEditor()">Cerrar</button>
+        </div>
+    </div>
+</div>
 
 <script>
-document.querySelectorAll("details.grupo").forEach(d => {
-    d.addEventListener("toggle", () => {
-        if(d.open){
-            document.querySelectorAll("details.grupo").forEach(o => {
-                if(o !== d) o.removeAttribute("open");
-            });
-        }
-    });
-});
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+}
 
-function toggleCheck(el, detalleId){
-    const isChecked = el.classList.toggle("checked");
-    const progressBar = el.closest(".producto").querySelector(".progress-bar");
-    
-    if(isChecked){
-        progressBar.style.width = "100%";
-    } else {
-        progressBar.style.width = "0%";
-    }
-    
-    fetch("/toggle_entregado",{
-        method:"POST",
-        headers:{"Content-Type":"application/x-www-form-urlencoded"},
-        body:`detalle_id=${detalleId}&checked=${isChecked}`
+const IS_ADMIN = {{ is_admin|tojson }};
+const PRODUCTS = {{ productos|tojson }};
+let activeComandaId = null;
+let recognition = null;
+let isListening = false;
+let kitchenAudioCtx = null;
+let soundGainLevel = Number(localStorage.getItem('kitchenSoundLevel') || '0.12');
+let colorIntensity = localStorage.getItem('kitchenColorIntensity') || 'medium';
+
+function toast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function normalizarTexto(t){
+    return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function hashCategoria(texto){
+    const s = normalizarTexto(texto);
+    let h = 0;
+    for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) % 360;
+    return h;
+}
+
+function aplicarColoresDinamicos(){
+    const cats = document.querySelectorAll('.cat[data-categoria]');
+    const intensityMap = {
+        soft: { sat: 62, light: 45, alpha: 0.09 },
+        medium: { sat: 72, light: 42, alpha: 0.14 },
+        strong: { sat: 82, light: 39, alpha: 0.2 }
+    };
+    const cfg = intensityMap[colorIntensity] || intensityMap.medium;
+
+    cats.forEach(cat => {
+        const h = hashCategoria(cat.dataset.categoria || 'general');
+        const accent = `hsl(${h} ${cfg.sat}% ${cfg.light}%)`;
+        const soft = `hsla(${h}, ${cfg.sat + 8}%, 56%, ${cfg.alpha})`;
+        cat.style.setProperty('--cat-accent', accent);
+        cat.style.setProperty('--cat-soft', soft);
     });
 }
 
-let ultimoIdActual = {{ comandas[-1].id if comandas else 0 }};
+function ensureAudioContext(){
+    if (!kitchenAudioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        kitchenAudioCtx = new AC();
+    }
+    if (kitchenAudioCtx.state === 'suspended') {
+        kitchenAudioCtx.resume().catch(() => {});
+    }
+    return kitchenAudioCtx;
+}
 
+function playCuiSound(){
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    const vol = Math.max(0, Math.min(0.25, soundGainLevel || 0));
+    if (vol === 0) return;
+    const t0 = ctx.currentTime + 0.01;
+
+    // Dos chillidos cortos para imitar el "cui".
+    [0, 0.18].forEach(offset => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(620 + (offset * 200), t0 + offset);
+        osc.frequency.exponentialRampToValueAtTime(980 + (offset * 150), t0 + offset + 0.06);
+        osc.frequency.exponentialRampToValueAtTime(680, t0 + offset + 0.12);
+        gain.gain.setValueAtTime(0.0001, t0 + offset);
+        gain.gain.exponentialRampToValueAtTime(vol, t0 + offset + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + offset + 0.14);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t0 + offset);
+        osc.stop(t0 + offset + 0.16);
+    });
+}
+
+function buscarProductoPorTexto(texto){
+    const objetivo = normalizarTexto(texto);
+    let exacto = PRODUCTS.find(p => normalizarTexto(p.nombre) === objetivo);
+    if (exacto) return exacto;
+    return PRODUCTS.find(p => objetivo.includes(normalizarTexto(p.nombre)) || normalizarTexto(p.nombre).includes(objetivo));
+}
+
+async function postJSON(url, payload){
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload || {})
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Error de servidor');
+    return data;
+}
+
+async function ajustarDetalle(detalleId, accion){
+    try{
+        const r = await postJSON(`/api/cocina/detalle/${detalleId}/cantidad`, { accion });
+        const card = document.querySelector(`.item[data-detalle-id="${detalleId}"]`);
+        if (!card) return;
+        const delivered = card.querySelector('.delivered');
+        const total = Number((card.querySelector('.item-qty').textContent || 'x0').replace('x',''));
+        const bar = card.querySelector('.item-progress > span');
+        delivered.textContent = String(r.entregado_cantidad);
+        bar.style.width = `${Math.min(100, (r.entregado_cantidad / Math.max(1,total)) * 100)}%`;
+        if (r.pendientes === 0) toast('Comanda lista');
+    } catch(err){
+        toast(err.message);
+    }
+}
+
+async function entregarTodo(comandaId){
+    if (!confirm(`¿Marcar toda la comanda #${comandaId} como entregada?`)) return;
+    try{
+        await postJSON(`/api/cocina/comanda/${comandaId}/entregar_todo`, {});
+        toast('Comanda entregada completa');
+        setTimeout(() => location.reload(), 350);
+    } catch(err){
+        toast(err.message);
+    }
+}
+
+function abrirEditor(comandaId){
+    activeComandaId = comandaId;
+    document.getElementById('editorComandaId').textContent = String(comandaId);
+    const sel = document.getElementById('editorProducto');
+    sel.innerHTML = PRODUCTS.map(p => `<option value="${p.id}">${p.categoria} - ${p.nombre}</option>`).join('');
+    document.getElementById('editorCantidad').value = 1;
+    document.getElementById('editorObs').value = '';
+    document.getElementById('editorModal').classList.add('show');
+}
+
+function cerrarEditor(){
+    document.getElementById('editorModal').classList.remove('show');
+}
+
+async function modificarComanda(accion, override){
+    const comandaId = override?.comandaId || activeComandaId;
+    if (!comandaId){ toast('Selecciona una comanda'); return; }
+
+    const productoId = Number(override?.productoId || document.getElementById('editorProducto').value);
+    const cantidad = Number(override?.cantidad || document.getElementById('editorCantidad').value || 1);
+    const observaciones = override?.observaciones ?? document.getElementById('editorObs').value;
+
+    try{
+        const r = await postJSON(`/api/cocina/comanda/${comandaId}/modificar`, {
+            accion, producto_id: productoId, cantidad, observaciones
+        });
+        toast(`${accion === 'agregar' ? 'Agregado' : 'Quitado'}: ${r.producto}`);
+        setTimeout(() => location.reload(), 350);
+    } catch(err){
+        toast(err.message);
+    }
+}
+
+function initVoice(){
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR){
+        document.getElementById('micBtn').style.display = 'none';
+        return;
+    }
+    recognition = new SR();
+    recognition.lang = 'es-MX';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+        isListening = true;
+        document.getElementById('micBtn').classList.add('listening');
+        toast('Escuchando...');
+    };
+    recognition.onend = () => {
+        isListening = false;
+        document.getElementById('micBtn').classList.remove('listening');
+    };
+    recognition.onerror = () => {
+        isListening = false;
+        document.getElementById('micBtn').classList.remove('listening');
+        toast('No pude usar el microfono');
+    };
+    recognition.onresult = (e) => {
+        const text = e.results[e.results.length - 1][0].transcript || '';
+        procesarComandoVozCocina(text);
+    };
+}
+
+function toggleVoice(){
+    if (!recognition) return;
+    if (isListening) recognition.stop();
+    else recognition.start();
+}
+
+async function procesarComandoVozCocina(textoOriginal){
+    const texto = normalizarTexto(textoOriginal);
+    toast(`"${textoOriginal}"`);
+
+    let comandaId = activeComandaId;
+    const matchComanda = texto.match(/comanda\s*(\d+)/);
+    if (matchComanda) comandaId = Number(matchComanda[1]);
+
+    if (!comandaId){
+        toast('Di o selecciona una comanda primero');
+        return;
+    }
+
+    if (texto.includes('entregar todo')){
+        await entregarTodo(comandaId);
+        return;
+    }
+
+    const agregarQuitar = texto.match(/(agregar|anadir|anade|quitar|quita|eliminar)\s*(\d+)?\s*(.*)/);
+    if (agregarQuitar){
+        const accionRaw = agregarQuitar[1];
+        const cantidad = Number(agregarQuitar[2] || 1);
+        let productoTexto = (agregarQuitar[3] || '').replace(/comanda\s*\d+/, '').trim();
+        if (!productoTexto){ toast('Indica el producto'); return; }
+        const p = buscarProductoPorTexto(productoTexto);
+        if (!p){ toast('No encontre ese producto'); return; }
+
+        const accion = (accionRaw.startsWith('agreg') || accionRaw.startsWith('ana')) ? 'agregar' : 'quitar';
+        await modificarComanda(accion, { comandaId, productoId: p.id, cantidad, observaciones: '' });
+        return;
+    }
+
+    const confirmar = texto.match(/(entrega|confirma)\s*(\d+)?\s*(.*)/);
+    if (confirmar){
+        const cantidad = Number(confirmar[2] || 1);
+        let nombre = (confirmar[3] || '').replace(/comanda\s*\d+/, '').trim();
+        if (!nombre){ toast('Indica el producto a confirmar'); return; }
+
+        const objetivo = normalizarTexto(nombre);
+        const filas = Array.from(document.querySelectorAll(`.item[data-comanda-id="${comandaId}"]`));
+        const fila = filas.find(f => {
+            const n = normalizarTexto(f.dataset.nombre || '');
+            return n.includes(objetivo) || objetivo.includes(n);
+        });
+        if (!fila){ toast('No encontre ese producto en la comanda'); return; }
+
+        const detalleId = Number(fila.dataset.detalleId);
+        for (let i = 0; i < cantidad; i += 1){
+            await ajustarDetalle(detalleId, 'sumar');
+        }
+        return;
+    }
+
+    toast('Comando no reconocido');
+}
+
+function initSoundControl(){
+    const sel = document.getElementById('soundLevel');
+    if (!sel) return;
+    sel.value = String(soundGainLevel);
+    sel.addEventListener('change', () => {
+        soundGainLevel = Number(sel.value);
+        localStorage.setItem('kitchenSoundLevel', String(soundGainLevel));
+        ensureAudioContext();
+        playCuiSound();
+    });
+}
+
+function abrirAjustesAdmin(){
+    if (!IS_ADMIN) return;
+    const modal = document.getElementById('adminModal');
+    const sel = document.getElementById('colorIntensity');
+    if (sel) sel.value = colorIntensity;
+    if (modal) modal.classList.add('show');
+}
+
+function cerrarAjustesAdmin(){
+    const modal = document.getElementById('adminModal');
+    if (modal) modal.classList.remove('show');
+}
+
+function guardarAjustesAdmin(){
+    if (!IS_ADMIN) return;
+    const sel = document.getElementById('colorIntensity');
+    colorIntensity = sel ? sel.value : 'medium';
+    localStorage.setItem('kitchenColorIntensity', colorIntensity);
+    aplicarColoresDinamicos();
+    cerrarAjustesAdmin();
+    toast('Ajustes admin guardados');
+}
+
+let ultimoIdActual = {{ comandas[-1].id if comandas else 0 }};
 setInterval(() => {
-    fetch("/api/ultima_comanda")
-        .then(res => res.json())
-        .then(data => {
-            if (data.ultimo_id > ultimoIdActual) {
-                location.reload();
+    fetch('/api/ultima_comanda')
+        .then(r => r.json())
+        .then(d => {
+            if (d.ultimo_id > ultimoIdActual) {
+                ultimoIdActual = d.ultimo_id;
+                toast('Nuevo pedido en cocina');
+                playCuiSound();
+                setTimeout(() => location.reload(), 900);
             }
         })
         .catch(() => {});
 }, 5000);
-</script>
 
+document.addEventListener('click', ensureAudioContext, { once: true });
+initSoundControl();
+aplicarColoresDinamicos();
+initVoice();
+</script>
 </body>
 </html>

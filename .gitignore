@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Local database and runtime files
+database.db
+*.sqlite3
+
+# Environment files
+.env
+
+# User-uploaded ticket images
+static/tickets/
+
+# Local editor/system artifacts
+.DS_Store
+Thumbs.db

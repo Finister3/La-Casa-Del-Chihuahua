@@ -3,20 +3,31 @@
 # =========================
 import os
 import csv
+import json
 import shutil
 import sqlite3
 from datetime import datetime, date, timedelta
 from io import StringIO, BytesIO
 from functools import wraps
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, session, send_file, jsonify, g, flash
+from flask.json.provider import DefaultJSONProvider
+
+
+class SQLiteJSONProvider(DefaultJSONProvider):
+    """Serializa sqlite3.Row para evitar errores en jsonify/tojson."""
+    def default(self, obj):
+        if isinstance(obj, sqlite3.Row):
+            return dict(obj)
+        return super().default(obj)
 
 
 # =========================
 # CONFIGURACIÓN APP
 # =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.join(BASE_DIR, "database.db")
+DB = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "database.db"))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 TICKETS_FOLDER = os.path.join(BASE_DIR, "static", "tickets")
 
@@ -25,12 +36,82 @@ for folder in [UPLOAD_FOLDER, TICKETS_FOLDER]:
     os.makedirs(folder, exist_ok=True)
 
 app = Flask(__name__)
-app.secret_key = "pos_secreto"
+app.json_provider_class = SQLiteJSONProvider
+app.json = app.json_provider_class(app)
+app.secret_key = os.environ.get("SECRET_KEY", "pos_secreto")
 
 # =========================
 # CONFIGURACIÓN NEGOCIO
 # =========================
 NOMBRE_NEGOCIO = "La Casa Del Chihuahua"
+
+PRIVILEGIOS_CATALOGO = {
+    "perm_ventas": "Ventas e historial",
+    "perm_comandas": "Comandas y mesas",
+    "perm_cocina": "Pantalla y acciones de cocina",
+    "perm_control": "Control y tickets",
+    "perm_corte": "Corte y exportación",
+    "perm_inventario": "Inventario operativo",
+    "perm_gastos": "Gastos y apartados",
+    "perm_productos": "Productos y precios",
+    "perm_catalogo": "Catálogo de insumos",
+    "perm_respaldos": "Respaldo de base de datos",
+    "perm_usuarios": "Gestión de usuarios",
+}
+
+ENDPOINT_PRIVILEGIOS = {
+    # Operación ventas/comandas
+    "venta_rapida": "perm_ventas",
+    "ventas": "perm_ventas",
+    "eliminar_venta": "perm_ventas",
+    "comandas": "perm_comandas",
+    "editar_comanda": "perm_comandas",
+    "cerrar_comanda": "perm_comandas",
+    "cambiar_estado": "perm_comandas",
+    "comanda_ticket": "perm_comandas",
+    "mesas": "perm_comandas",
+    # Cocina
+    "cocina": "perm_cocina",
+    "entregar_uno": "perm_cocina",
+    "quitar_uno": "perm_cocina",
+    "entregar_todo": "perm_cocina",
+    "toggle_entregado": "perm_cocina",
+    "api_cocina_detalle_cantidad": "perm_cocina",
+    "api_cocina_entregar_todo": "perm_cocina",
+    "api_cocina_modificar_comanda": "perm_cocina",
+    "api_ultima_comanda": "perm_cocina",
+    # Control/corte
+    "control": "perm_control",
+    "ver_tickets": "perm_control",
+    "eliminar_ticket": "perm_control",
+    "corte": "perm_corte",
+    "corte_diario": "perm_corte",
+    "exportar_ventas_csv": "perm_corte",
+    "exportar_ranking_csv": "perm_corte",
+    # Inventario
+    "inventario": "perm_inventario",
+    "inventario_movimiento": "perm_inventario",
+    "inventario_nuevo": "perm_inventario",
+    "api_consulta_inventario": "perm_inventario",
+    "api_alertas_inventario": "perm_inventario",
+    # Administración y finanzas
+    "gastos": "perm_gastos",
+    "eliminar_gasto": "perm_gastos",
+    "editar_gasto": "perm_gastos",
+    "apartados": "perm_gastos",
+    "productos": "perm_productos",
+    "editar_producto": "perm_productos",
+    "eliminar_producto": "perm_productos",
+    "api_stats_producto": "perm_productos",
+    "catalogo_insumos": "perm_catalogo",
+    "api_insumo": "perm_catalogo",
+    "crear_insumos_bulk": "perm_catalogo",
+    "respaldar_db": "perm_respaldos",
+    "admin_usuarios": "perm_usuarios",
+    "admin_usuarios_crear": "perm_usuarios",
+    "admin_usuarios_editar": "perm_usuarios",
+    "admin_usuarios_eliminar": "perm_usuarios",
+}
 
 CATEGORIAS = [
     "Quesadilla", "Gordita", "Sopes", "Pambazo",
@@ -84,6 +165,35 @@ def execute_db(query, args=()):
     cur = db.execute(query, args)
     db.commit()
     return cur.lastrowid
+
+def _is_password_hash(value):
+    """Detecta formatos hash de Werkzeug para mantener compatibilidad legacy."""
+    if not value or not isinstance(value, str):
+        return False
+    return value.startswith("pbkdf2:") or value.startswith("scrypt:")
+
+def verify_password(stored_password, provided_password):
+    """Valida password hasheado y soporta temporalmente texto plano existente."""
+    if _is_password_hash(stored_password):
+        return check_password_hash(stored_password, provided_password), False
+    return stored_password == provided_password, True
+
+def parse_permisos_extra(value):
+    if not value:
+        return []
+    if isinstance(value, list):
+        return [p for p in value if p in PRIVILEGIOS_CATALOGO]
+    try:
+        arr = json.loads(value)
+        if isinstance(arr, list):
+            return [p for p in arr if p in PRIVILEGIOS_CATALOGO]
+    except (TypeError, ValueError, json.JSONDecodeError):
+        pass
+    return []
+
+def permisos_to_json(permisos):
+    validos = [p for p in (permisos or []) if p in PRIVILEGIOS_CATALOGO]
+    return json.dumps(validos, ensure_ascii=True)
 
 # =========================
 # INICIALIZACIÓN BD (CON CORRECCIONES DE ESQUEMA)
@@ -235,6 +345,12 @@ def init_db():
         # La columna no existe, agregarla
         db.execute("ALTER TABLE tickets ADD COLUMN semana_id INTEGER")
         print("Columna semana_id agregada a tickets")
+
+    try:
+        db.execute("SELECT permisos_extra FROM usuarios LIMIT 1")
+    except sqlite3.OperationalError:
+        db.execute("ALTER TABLE usuarios ADD COLUMN permisos_extra TEXT")
+        print("Columna permisos_extra agregada a usuarios")
     
     # 3. Crear índices si no existen (ignorar errores si ya existen)
     indices = [
@@ -259,8 +375,8 @@ def init_db():
     
     db.execute("""
         INSERT OR IGNORE INTO usuarios (usuario, password, rol) 
-        VALUES ('admin', 'admin', 'admin')
-    """)
+        VALUES (?, ?, ?)
+    """, ["admin", generate_password_hash("admin"), "admin"])
     
     # Insertar apartados base si no existen (basado en tu captura)
     apartados_default = [
@@ -293,6 +409,9 @@ def init_db():
             VALUES (?, ?, 'ACTIVA')
         """, [viernes.isoformat(), domingo.isoformat()])
     
+    # Inicializar tablas y catálogos de inventario sin sobrescribir esta función.
+    init_db_inventory(db)
+
     db.commit()
     print("Base de datos inicializada correctamente")
 
@@ -445,6 +564,33 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def user_has_privilege(privilegio):
+    extras = session.get("permisos_extra") or []
+    return privilegio in extras or "perm_all" in extras
+
+def roles_required(*allowed_roles, privilege=None):
+    """Restringe acceso por rol ya autenticado."""
+    allowed = set(allowed_roles)
+
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            rol = session.get("rol")
+            if rol not in allowed:
+                needed = privilege or ENDPOINT_PRIVILEGIOS.get(f.__name__)
+                if not needed or not user_has_privilege(needed):
+                    flash("No tienes permisos para esta sección.", "error")
+                    return redirect("/")
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
+ROLE_ADMIN = ("admin",)
+ROLE_ADMIN_CAJERO = ("admin", "cajero")
+ROLE_OPERACION = ("admin", "cajero", "mesero")
+ROLE_ALL = ("admin", "cajero", "mesero", "cocina")
+
 # =========================
 # RUTAS (MANTENIENDO API ORIGINAL)
 # =========================
@@ -457,14 +603,25 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        usuario_input = request.form.get("usuario", "").strip()
+        password_input = request.form.get("password", "")
+
         user = query_db("""
-            SELECT usuario, rol FROM usuarios 
-            WHERE usuario=? AND password=?
-        """, [request.form["usuario"], request.form["password"]], one=True)
+            SELECT id, usuario, password, rol, COALESCE(permisos_extra, '[]') as permisos_extra FROM usuarios 
+            WHERE usuario=?
+        """, [usuario_input], one=True)
         
         if user:
+            is_valid, is_legacy = verify_password(user["password"], password_input)
+            if is_valid and is_legacy:
+                # Migración transparente: al iniciar sesión con password legacy se guarda hasheado.
+                execute_db("UPDATE usuarios SET password=? WHERE id=?",
+                           [generate_password_hash(password_input), user["id"]])
+
+        if user and is_valid:
             session["usuario"] = user["usuario"]
             session["rol"] = user["rol"]
+            session["permisos_extra"] = parse_permisos_extra(user["permisos_extra"])
             return redirect("/")
         return render_template("login.html", error="Credenciales incorrectas")
     
@@ -473,6 +630,7 @@ def login():
 # ---------- CONTROL (OPTIMIZADO) ----------
 @app.route("/control")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def control():
     fecha_inicio = request.args.get("inicio")
     fecha_fin = request.args.get("fin")
@@ -545,6 +703,7 @@ def control():
     
 @app.route("/historial_cortes")
 @login_required
+@roles_required(*ROLE_ADMIN)
 def historial_cortes():
     cortes = query_db("""
         SELECT id, fecha_inicio, fecha_fin, ventas, gastos, utilidad, creado_en
@@ -558,6 +717,7 @@ def historial_cortes():
 # ---------- TICKETS/GASTOS ----------
 @app.route("/subir_ticket", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def subir_ticket():
     categoria = request.form.get("categoria")
     monto = float(request.form.get("monto", 0))
@@ -593,6 +753,7 @@ def subir_ticket():
 
 @app.route("/eliminar_ticket/<int:id>", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def eliminar_ticket(id):
     # Obtener info del ticket antes de eliminar para actualizar apartado
     ticket = query_db("SELECT semana_id, categoria, monto FROM tickets WHERE id=?", [id], one=True)
@@ -619,6 +780,7 @@ def eliminar_ticket(id):
 
 @app.route("/tickets")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def ver_tickets():
     categoria = request.args.get("categoria", "")
     fecha = request.args.get("fecha", "")
@@ -646,6 +808,7 @@ def ver_tickets():
 # ---------- PRODUCTOS ----------
 @app.route("/productos", methods=["GET", "POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def productos():
     if request.method == "POST":
         execute_db("""
@@ -659,6 +822,7 @@ def productos():
 
 @app.route("/editar_producto/<int:producto_id>", methods=["GET", "POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def editar_producto(producto_id):
     if request.method == "POST":
         execute_db("""
@@ -673,6 +837,7 @@ def editar_producto(producto_id):
 
 @app.route("/eliminar_producto/<int:producto_id>")
 @login_required
+@roles_required(*ROLE_ADMIN)
 def eliminar_producto(producto_id):
     execute_db("DELETE FROM productos WHERE id=?", [producto_id])
     return redirect("/productos")
@@ -680,6 +845,7 @@ def eliminar_producto(producto_id):
 # ---------- VENTAS Y COMANDAS ----------
 @app.route("/ventas")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def ventas():
     ventas_db = query_db("""
         SELECT id, fecha, total FROM ventas ORDER BY id DESC
@@ -706,6 +872,7 @@ def ventas():
 
 @app.route("/eliminar_venta/<int:venta_id>", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def eliminar_venta(venta_id):
     execute_db("DELETE FROM detalle_venta WHERE venta_id=?", [venta_id])
     execute_db("DELETE FROM ventas WHERE id=?", [venta_id])
@@ -713,6 +880,7 @@ def eliminar_venta(venta_id):
 
 @app.route("/venta_rapida", methods=["GET", "POST"])
 @login_required
+@roles_required(*ROLE_OPERACION)
 def venta_rapida():
     if request.method == "GET":
         productos = query_db("SELECT * FROM productos ORDER BY categoria, nombre")
@@ -777,6 +945,7 @@ def venta_rapida():
 # ---------- COMANDAS ----------
 @app.route("/comandas")
 @login_required
+@roles_required(*ROLE_OPERACION)
 def comandas():
     comandas_db = query_db("""
         SELECT id, estado, tipo, mesa, alias
@@ -838,6 +1007,7 @@ def comandas():
 
 @app.route("/editar_comanda/<int:comanda_id>", methods=["GET", "POST"])
 @login_required
+@roles_required(*ROLE_OPERACION)
 def editar_comanda(comanda_id):
     if request.method == "POST":
         # Actualizar existentes
@@ -892,6 +1062,7 @@ def editar_comanda(comanda_id):
 
 @app.route("/cerrar_comanda/<int:comanda_id>")
 @login_required
+@roles_required(*ROLE_OPERACION)
 def cerrar_comanda(comanda_id):
     detalle = query_db("""
         SELECT d.producto_id, d.cantidad, p.precio
@@ -914,6 +1085,9 @@ def cerrar_comanda(comanda_id):
             INSERT INTO detalle_venta (venta_id, producto_id, cantidad, subtotal)
             VALUES (?,?,?,?)
         """, [venta_id, d["producto_id"], d["cantidad"], subtotal])
+
+        # Descuento automatico de inventario segun receta (si existe configuracion)
+        descontar_inventario_por_venta(d["producto_id"], d["cantidad"])
     
     # Actualizar control diario
     execute_db("""
@@ -929,6 +1103,7 @@ def cerrar_comanda(comanda_id):
 
 @app.route("/cambiar_estado/<int:comanda_id>")
 @login_required
+@roles_required(*ROLE_OPERACION)
 def cambiar_estado(comanda_id):
     estado = query_db("SELECT estado FROM comandas WHERE id=?", 
                      [comanda_id], one=True)["estado"]
@@ -939,6 +1114,7 @@ def cambiar_estado(comanda_id):
 
 @app.route("/comanda_ticket/<int:comanda_id>")
 @login_required
+@roles_required(*ROLE_OPERACION)
 def comanda_ticket(comanda_id):
     comanda = query_db("SELECT * FROM comandas WHERE id=?", [comanda_id], one=True)
     if not comanda:
@@ -967,6 +1143,7 @@ def comanda_ticket(comanda_id):
 # ---------- COCINA ----------
 @app.route("/cocina")
 @login_required
+@roles_required(*ROLE_ALL)
 def cocina():
     comandas_db = query_db("""
         SELECT id, estado, COALESCE(mesa,0) as mesa, 
@@ -992,10 +1169,14 @@ def cocina():
             "tipo": c["tipo"], "alias": c["alias"], "detalle": detalle
         })
     
-    return render_template("cocina.html", comandas=comandas)
+    productos_rows = query_db("SELECT id, nombre, categoria FROM productos ORDER BY categoria, nombre")
+    productos = [dict(p) for p in productos_rows] if productos_rows else []
+    is_admin = session.get("rol") == "admin"
+    return render_template("cocina.html", comandas=comandas, productos=productos, is_admin=is_admin)
 
 @app.route("/entregar_uno/<int:detalle_id>")
 @login_required
+@roles_required(*ROLE_ALL)
 def entregar_uno(detalle_id):
     detalle = query_db("""
         SELECT comanda_id, cantidad, entregado_cantidad 
@@ -1014,6 +1195,7 @@ def entregar_uno(detalle_id):
 
 @app.route("/quitar_uno/<int:detalle_id>")
 @login_required
+@roles_required(*ROLE_ALL)
 def quitar_uno(detalle_id):
     detalle = query_db("""
         SELECT comanda_id, entregado_cantidad 
@@ -1031,6 +1213,7 @@ def quitar_uno(detalle_id):
 
 @app.route("/entregar_todo/<int:comanda_id>")
 @login_required
+@roles_required(*ROLE_ALL)
 def entregar_todo(comanda_id):
     execute_db("""
         UPDATE detalle_comanda SET entregado_cantidad = cantidad WHERE comanda_id = ?
@@ -1040,6 +1223,7 @@ def entregar_todo(comanda_id):
 
 @app.route("/toggle_entregado", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ALL)
 def toggle_entregado():
     detalle_id = request.form.get("detalle_id")
     checked = request.form.get("checked") == "true"
@@ -1058,9 +1242,179 @@ def toggle_entregado():
     
     return "", 204
 
+@app.route("/api/cocina/detalle/<int:detalle_id>/cantidad", methods=["POST"])
+@login_required
+@roles_required(*ROLE_ALL)
+def api_cocina_detalle_cantidad(detalle_id):
+    """Actualiza entregado_cantidad por unidad para un detalle de comanda."""
+    data = request.get_json(silent=True) or request.form
+    accion = (data.get("accion") or "sumar").lower()
+
+    detalle = query_db("""
+        SELECT id, comanda_id, cantidad, entregado_cantidad
+        FROM detalle_comanda
+        WHERE id = ?
+    """, [detalle_id], one=True)
+
+    if not detalle:
+        return jsonify({"error": "Detalle no encontrado"}), 404
+
+    cantidad_total = int(detalle["cantidad"] or 0)
+    entregado = int(detalle["entregado_cantidad"] or 0)
+
+    if accion == "sumar":
+        entregado = min(cantidad_total, entregado + 1)
+    elif accion == "restar":
+        entregado = max(0, entregado - 1)
+    elif accion == "toggle":
+        entregado = cantidad_total if entregado < cantidad_total else 0
+    else:
+        return jsonify({"error": "Accion invalida"}), 400
+
+    execute_db("UPDATE detalle_comanda SET entregado_cantidad = ? WHERE id = ?", [entregado, detalle_id])
+
+    # Recalcular estado de la comanda para mantener cocina consistente.
+    pendientes = query_db("""
+        SELECT COUNT(*) as p
+        FROM detalle_comanda
+        WHERE comanda_id = ? AND entregado_cantidad < cantidad
+    """, [detalle["comanda_id"]], one=True)["p"]
+
+    if pendientes == 0:
+        execute_db("UPDATE comandas SET estado = 'Lista' WHERE id = ?", [detalle["comanda_id"]])
+    else:
+        estado_actual = query_db("SELECT estado FROM comandas WHERE id = ?", [detalle["comanda_id"]], one=True)
+        if estado_actual and estado_actual["estado"] == "Lista":
+            execute_db("UPDATE comandas SET estado = 'Preparando' WHERE id = ?", [detalle["comanda_id"]])
+
+    return jsonify({
+        "ok": True,
+        "detalle_id": detalle_id,
+        "entregado_cantidad": entregado,
+        "cantidad": cantidad_total,
+        "comanda_id": detalle["comanda_id"],
+        "pendientes": pendientes
+    })
+
+@app.route("/api/cocina/comanda/<int:comanda_id>/entregar_todo", methods=["POST"])
+@login_required
+@roles_required(*ROLE_ALL)
+def api_cocina_entregar_todo(comanda_id):
+    execute_db("UPDATE detalle_comanda SET entregado_cantidad = cantidad WHERE comanda_id = ?", [comanda_id])
+    execute_db("UPDATE comandas SET estado = 'Lista' WHERE id = ?", [comanda_id])
+    return jsonify({"ok": True, "comanda_id": comanda_id})
+
+@app.route("/api/cocina/comanda/<int:comanda_id>/modificar", methods=["POST"])
+@login_required
+@roles_required(*ROLE_ALL)
+def api_cocina_modificar_comanda(comanda_id):
+    """Agrega o quita platillos de una comanda activa desde cocina."""
+
+    data = request.get_json(silent=True) or request.form
+
+    def _val_int(source, key):
+        val = source.get(key) if hasattr(source, "get") else None
+        try:
+            return int(val)
+        except (TypeError, ValueError):
+            return None
+
+    producto_id = _val_int(data, "producto_id")
+    accion = str(data.get("accion", "")).lower().strip() if hasattr(data, "get") else ""
+    cantidad = _val_int(data, "cantidad")
+    observaciones = (data.get("observaciones") or "").strip() if hasattr(data, "get") else ""
+
+    if not producto_id or accion not in ["agregar", "quitar"]:
+        return jsonify({"error": "Parametros invalidos"}), 400
+
+    cantidad = max(1, int(cantidad or 1))
+
+    comanda = query_db("SELECT id, estado FROM comandas WHERE id = ?", [comanda_id], one=True)
+    if not comanda:
+        return jsonify({"error": "Comanda no encontrada"}), 404
+
+    producto = query_db("SELECT id, nombre FROM productos WHERE id = ?", [producto_id], one=True)
+    if not producto:
+        return jsonify({"error": "Producto no encontrado"}), 404
+
+    db = get_db()
+
+    if accion == "agregar":
+        existente = query_db("""
+            SELECT id, cantidad FROM detalle_comanda
+            WHERE comanda_id = ? AND producto_id = ? AND COALESCE(observaciones, '') = ?
+            LIMIT 1
+        """, [comanda_id, producto_id, observaciones], one=True)
+
+        if existente:
+            db.execute("UPDATE detalle_comanda SET cantidad = cantidad + ? WHERE id = ?", [cantidad, existente["id"]])
+        else:
+            db.execute("""
+                INSERT INTO detalle_comanda (comanda_id, producto_id, cantidad, observaciones, entregado_cantidad)
+                VALUES (?, ?, ?, ?, 0)
+            """, [comanda_id, producto_id, cantidad, observaciones])
+
+        # Si estaba marcada como lista, al agregar vuelve a preparación.
+        if comanda["estado"] == "Lista":
+            db.execute("UPDATE comandas SET estado = 'Preparando' WHERE id = ?", [comanda_id])
+
+        db.commit()
+        return jsonify({"ok": True, "accion": "agregar", "producto": producto["nombre"], "cantidad": cantidad})
+
+    # accion == "quitar"
+    filas = query_db("""
+        SELECT id, cantidad, entregado_cantidad
+        FROM detalle_comanda
+        WHERE comanda_id = ? AND producto_id = ?
+        ORDER BY id DESC
+    """, [comanda_id, producto_id])
+
+    if not filas:
+        return jsonify({"error": "Ese producto no esta en la comanda"}), 400
+
+    restante = cantidad
+    for f in filas:
+        if restante <= 0:
+            break
+
+        actual = int(f["cantidad"])
+        quitar = min(actual, restante)
+        nuevo = actual - quitar
+
+        if nuevo <= 0:
+            db.execute("DELETE FROM detalle_comanda WHERE id = ?", [f["id"]])
+        else:
+            nuevo_entregado = min(int(f["entregado_cantidad"] or 0), nuevo)
+            db.execute("UPDATE detalle_comanda SET cantidad = ?, entregado_cantidad = ? WHERE id = ?",
+                       [nuevo, nuevo_entregado, f["id"]])
+        restante -= quitar
+
+    if restante > 0:
+        db.rollback()
+        return jsonify({"error": "No hay suficiente cantidad para quitar"}), 400
+
+    quedan = query_db("SELECT COUNT(*) as c FROM detalle_comanda WHERE comanda_id = ?", [comanda_id], one=True)["c"]
+    if quedan == 0:
+        db.execute("DELETE FROM comandas WHERE id = ?", [comanda_id])
+        db.commit()
+        return jsonify({"ok": True, "accion": "quitar", "producto": producto["nombre"], "cantidad": cantidad, "comanda_eliminada": True})
+
+    pendientes = query_db("""
+        SELECT COUNT(*) as p
+        FROM detalle_comanda
+        WHERE comanda_id = ? AND entregado_cantidad < cantidad
+    """, [comanda_id], one=True)["p"]
+
+    nuevo_estado = "Lista" if pendientes == 0 else "Preparando"
+    db.execute("UPDATE comandas SET estado = ? WHERE id = ?", [nuevo_estado, comanda_id])
+    db.commit()
+
+    return jsonify({"ok": True, "accion": "quitar", "producto": producto["nombre"], "cantidad": cantidad, "comanda_eliminada": False})
+
 # ---------- MESAS ----------
 @app.route("/mesas")
 @login_required
+@roles_required(*ROLE_OPERACION)
 def mesas():
     comandas_activas = query_db("""
         SELECT id, tipo, mesa, estado FROM comandas WHERE estado != 'Cerrada'
@@ -1091,6 +1445,7 @@ def mesas():
 # ---------- CORTES ----------
 @app.route("/corte")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def corte():
     hoy = query_db("""
         SELECT COUNT(*) as total_ventas, IFNULL(SUM(total),0) as total_dinero
@@ -1115,6 +1470,7 @@ def corte():
 
 @app.route("/corte_diario", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def corte_diario():
     ventas = query_db("""
         SELECT IFNULL(SUM(total),0) FROM ventas 
@@ -1137,6 +1493,7 @@ def corte_diario():
 # ---------- GASTOS ADICIONALES ----------
 @app.route("/gastos", methods=["GET", "POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def gastos():
     semana_actual = get_semana_actual()
     
@@ -1208,11 +1565,33 @@ def guardar_gasto():
 
 @app.route("/gastos/eliminar/<int:id>", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def eliminar_gasto(id):
-    return eliminar_ticket(id)
+    # Obtener info del ticket antes de eliminar para actualizar apartado
+    ticket = query_db("SELECT semana_id, categoria, monto FROM tickets WHERE id=?", [id], one=True)
+
+    if ticket and ticket["semana_id"]:
+        db = get_db()
+        db.execute("""
+            UPDATE apartados_semanales
+            SET gastado = MAX(0, gastado - ?)
+            WHERE semana_id = ? AND categoria = ?
+        """, [ticket["monto"], ticket["semana_id"], ticket["categoria"]])
+        db.commit()
+
+    # Eliminar archivo si existe
+    row = query_db("SELECT archivo FROM tickets WHERE id=?", [id], one=True)
+    if row and row["archivo"]:
+        ruta = os.path.join(TICKETS_FOLDER, row["archivo"])
+        if os.path.exists(ruta):
+            os.remove(ruta)
+
+    execute_db("DELETE FROM tickets WHERE id=?", [id])
+    return redirect("/gastos")
 
 @app.route("/gastos/editar/<int:id>", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def editar_gasto(id):
     execute_db("""
         UPDATE tickets 
@@ -1230,6 +1609,7 @@ def editar_gasto(id):
 # ---------- APARTADOS SEMANALES OPTIMIZADOS ----------
 @app.route("/apartados", methods=["GET", "POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def apartados():
     semana = get_semana_actual()
     
@@ -1325,6 +1705,7 @@ def apartados():
 # ---------- EXPORTAR ----------
 @app.route("/exportar_ventas_csv")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def exportar_ventas_csv():
     ventas = query_db("""
         SELECT id, fecha, total FROM ventas 
@@ -1347,6 +1728,7 @@ def exportar_ventas_csv():
 
 @app.route("/exportar_ranking_csv")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def exportar_ranking_csv():
     ranking = query_db("""
         SELECT p.nombre, SUM(dv.cantidad) as cantidad, SUM(dv.subtotal) as total
@@ -1374,6 +1756,7 @@ def exportar_ranking_csv():
 # ---------- RESPALDO ----------
 @app.route("/respaldar_db")
 @login_required
+@roles_required(*ROLE_ADMIN)
 def respaldar_db():
     backup_dir = os.path.join(BASE_DIR, "respaldos")
     os.makedirs(backup_dir, exist_ok=True)
@@ -1395,6 +1778,7 @@ def respaldar_db():
 # ---------- API ----------
 @app.route("/api/ultima_comanda")
 @login_required
+@roles_required(*ROLE_ALL)
 def api_ultima_comanda():
     ultima = query_db("""
         SELECT IFNULL(MAX(id), 0) as ultimo_id 
@@ -1404,6 +1788,8 @@ def api_ultima_comanda():
     return jsonify({"ultimo_id": ultima["ultimo_id"]})
     
 @app.route("/api/dashboard_data")
+@login_required
+@roles_required(*ROLE_ALL)
 def api_dashboard():
     hoy = date.today().isoformat()
     ayer = (date.today() - timedelta(days=1)).isoformat()
@@ -1435,8 +1821,13 @@ def admin_usuarios():
     if session.get("rol") != "admin":
         return redirect("/")
     
-    usuarios = query_db("SELECT id, usuario, rol FROM usuarios ORDER BY id")
-    return render_template("admin_usuarios.html", usuarios=usuarios)
+    rows = query_db("SELECT id, usuario, rol, COALESCE(permisos_extra, '[]') as permisos_extra FROM usuarios ORDER BY id")
+    usuarios = []
+    for r in rows:
+        u = dict(r)
+        u["permisos_extra_list"] = parse_permisos_extra(u.get("permisos_extra"))
+        usuarios.append(u)
+    return render_template("admin_usuarios.html", usuarios=usuarios, privilegios_catalogo=PRIVILEGIOS_CATALOGO)
 
 @app.route("/admin/usuarios/crear", methods=["POST"])
 @login_required
@@ -1447,15 +1838,16 @@ def admin_usuarios_crear():
     usuario = request.form.get("usuario", "").strip()
     password = request.form.get("password", "")
     rol = request.form.get("rol", "mesero")
+    permisos_extra = request.form.getlist("permisos_extra")
     
     if not usuario or not password:
         return redirect("/admin/usuarios")
     
     try:
         execute_db("""
-            INSERT INTO usuarios (usuario, password, rol) 
-            VALUES (?, ?, ?)
-        """, [usuario, password, rol])
+            INSERT INTO usuarios (usuario, password, rol, permisos_extra) 
+            VALUES (?, ?, ?, ?)
+        """, [usuario, generate_password_hash(password), rol, permisos_to_json(permisos_extra)])
     except sqlite3.IntegrityError:
         # Usuario ya existe
         pass
@@ -1471,6 +1863,7 @@ def admin_usuarios_editar():
     user_id = request.form.get("user_id")
     nuevo_rol = request.form.get("rol")
     nueva_password = request.form.get("password", "").strip()
+    permisos_extra = request.form.getlist("permisos_extra")
     
     if not user_id:
         return redirect("/admin/usuarios")
@@ -1480,12 +1873,21 @@ def admin_usuarios_editar():
         execute_db("""
             UPDATE usuarios SET rol = ? WHERE id = ?
         """, [nuevo_rol, user_id])
+
+    execute_db("UPDATE usuarios SET permisos_extra = ? WHERE id = ?",
+               [permisos_to_json(permisos_extra), user_id])
     
     # Actualizar password solo si se proporcionó
     if nueva_password:
         execute_db("""
             UPDATE usuarios SET password = ? WHERE id = ?
-        """, [nueva_password, user_id])
+        """, [generate_password_hash(nueva_password), user_id])
+
+    # Si se editó el usuario actual, refrescar sesión para aplicar privilegios al instante.
+    usuario_actual = query_db("SELECT id FROM usuarios WHERE usuario = ?", [session.get("usuario")], one=True)
+    if usuario_actual and str(usuario_actual["id"]) == str(user_id):
+        session["rol"] = nuevo_rol or session.get("rol")
+        session["permisos_extra"] = [p for p in permisos_extra if p in PRIVILEGIOS_CATALOGO]
     
     return redirect("/admin/usuarios")
 
@@ -1515,11 +1917,9 @@ CATEGORIAS_INSUMO = ["Tortillas/Masa", "Carnes", "Quesos/Crema", "Verduras",
                      "Bebidas", "Empaque", "Gas/Cocina", "Limpieza", "Otros"]
 
 # =========================
-# ACTUALIZAR init_db() - Añadir al final del schema
+# INICIALIZACIÓN EXTENDIDA DE INVENTARIO
 # =========================
-def init_db():
-    # ... tu código actual ...
-    
+def init_db_inventory(db):
     schema_additions = """
     -- INSUMOS/INVENTARIO
     CREATE TABLE IF NOT EXISTS insumos (
@@ -1563,7 +1963,6 @@ def init_db():
     CREATE INDEX IF NOT EXISTS idx_movimientos_fecha ON movimientos_inventario(fecha);
     """
     
-    db = get_db()
     db.executescript(schema_additions)
     
     # Insumos por defecto para un restaurante de antojitos
@@ -1588,7 +1987,7 @@ def init_db():
             VALUES (?, ?, ?, ?, ?, datetime('now'))
         """, [nombre, cat, unidad, stock, minimo])
     
-    db.commit()
+    # El commit lo hace init_db() para mantener una sola transacción de arranque.
 
 # =========================
 # RUTAS DE INVENTARIO (Añadir al final antes del if __name__)
@@ -1596,6 +1995,7 @@ def init_db():
 
 @app.route("/inventario")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def inventario():
     """Vista principal de inventario con asistente de voz"""
     filtro_cat = request.args.get("categoria", "")
@@ -1663,6 +2063,7 @@ def inventario():
 
 @app.route("/inventario/movimiento", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def inventario_movimiento():
     """API para registrar entradas, salidas o mermas"""
     data = request.get_json() or request.form
@@ -1689,9 +2090,9 @@ def inventario_movimiento():
     if tipo == "ENTRADA":
         stock_nuevo = stock_previo + cantidad
     elif tipo in ["SALIDA", "MERMA"]:
-        stock_nuevo = max(0, stock_previo - cantidad)
-        if stock_nuevo < 0:
+        if cantidad > stock_previo:
             return jsonify({"error": "Stock insuficiente"}), 400
+        stock_nuevo = stock_previo - cantidad
     else:  # AJUSTE
         stock_nuevo = cantidad
     
@@ -1724,6 +2125,7 @@ def inventario_movimiento():
 
 @app.route("/inventario/nuevo", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def inventario_nuevo():
     """Agregar nuevo insumo al sistema"""
     nombre = request.form.get("nombre")
@@ -1743,6 +2145,7 @@ def inventario_nuevo():
 
 @app.route("/api/inventario/consulta")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def api_consulta_inventario():
     """API para el asistente de voz - consulta por nombre"""
     q = request.args.get("q", "").lower()
@@ -1774,6 +2177,7 @@ def api_consulta_inventario():
 
 @app.route("/api/inventario/alertas")
 @login_required
+@roles_required(*ROLE_ADMIN_CAJERO)
 def api_alertas_inventario():
     """Devuelve lista de insumos con stock bajo para el asistente"""
     alertas = query_db("""
@@ -1818,9 +2222,55 @@ def descontar_inventario_por_venta(producto_id, cantidad_vendida):
                 (insumo_id, tipo, cantidad, stock_previo, stock_nuevo, motivo, usuario)
                 VALUES (?, 'SALIDA', ?, ?, ?, 'Venta automática', 'sistema')
             """, [receta["insumo_id"], total_a_descontar, insumo["stock_actual"], nuevo_stock])
+
+@app.route("/api/stats_producto/<int:producto_id>")
+@login_required
+@roles_required(*ROLE_ADMIN)
+def api_stats_producto(producto_id):
+    """Estadisticas basicas de ventas por producto para la vista de edicion."""
+    stats = query_db("""
+        SELECT
+            COALESCE(SUM(dv.cantidad), 0) as veces_vendido,
+            COALESCE(SUM(dv.subtotal), 0) as ingresos_totales,
+            MAX(v.fecha) as ultima_venta,
+            COUNT(DISTINCT v.fecha) as dias_con_venta
+        FROM detalle_venta dv
+        JOIN ventas v ON v.id = dv.venta_id
+        WHERE dv.producto_id = ?
+    """, [producto_id], one=True)
+
+    historial = query_db("""
+        SELECT v.fecha, dv.cantidad, dv.subtotal
+        FROM detalle_venta dv
+        JOIN ventas v ON v.id = dv.venta_id
+        WHERE dv.producto_id = ?
+        ORDER BY v.fecha DESC, dv.id DESC
+        LIMIT 10
+    """, [producto_id])
+
+    veces_vendido = int(stats["veces_vendido"] or 0)
+    ingresos_totales = float(stats["ingresos_totales"] or 0)
+    dias_con_venta = int(stats["dias_con_venta"] or 0)
+    promedio_diario = round((veces_vendido / dias_con_venta), 2) if dias_con_venta > 0 else 0
+
+    return jsonify({
+        "veces_vendido": veces_vendido,
+        "ingresos_totales": ingresos_totales,
+        "ultima_venta": stats["ultima_venta"] or "Sin ventas",
+        "promedio_diario": promedio_diario,
+        "historial": [
+            {
+                "fecha": h["fecha"],
+                "cantidad": h["cantidad"],
+                "subtotal": float(h["subtotal"])
+            }
+            for h in historial
+        ]
+    })
             
 @app.route("/catalogo_insumos")
 @login_required
+@roles_required(*ROLE_ADMIN)
 def catalogo_insumos():
     """Vista limpia para gestionar el catálogo de insumos"""
     filtro_cat = request.args.get("categoria", "")
@@ -1864,6 +2314,7 @@ def catalogo_insumos():
 
 @app.route("/api/insumos/<int:id>", methods=["PUT", "DELETE"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def api_insumo(id):
     """API para editar o desactivar insumos"""
     db = get_db()
@@ -1910,6 +2361,7 @@ def api_insumo(id):
 
 @app.route("/api/insumos_bulk", methods=["POST"])
 @login_required
+@roles_required(*ROLE_ADMIN)
 def crear_insumos_bulk():
     """Crear múltiples insumos rápidamente (para cuando tienes muchos)"""
     data = request.get_json()
